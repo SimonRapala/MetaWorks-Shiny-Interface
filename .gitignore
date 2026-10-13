@@ -1,0 +1,29 @@
+# R session files
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+
+# Environment variables and private configuration
+.env
+config/app.yml
+
+# Installed renv packages and temporary files
+renv/library/
+renv/staging/
+renv/sandbox/
+
+# MetaWorks jobs and outputs
+jobs/
+project/jobs/
+
+# Large biological input files
+*.fastq
+*.fastq.gz
+*.fq
+*.fq.gz
+
+# Local databases
+*.sqlite
+*.sqlite3
+*.db
