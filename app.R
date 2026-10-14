@@ -1,6 +1,7 @@
 library(shiny)
 library(bslib)
 
+#Using bslib to better structure and control shiny
 ui <- page_sidebar(
   title = "My dashboard",
 
