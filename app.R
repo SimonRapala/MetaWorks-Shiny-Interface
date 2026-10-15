@@ -3,39 +3,32 @@ library(bslib)
 
 ui <- page_navbar(
   title = "MetaWorks 1.13",
-
   nav_panel(
     title = "Home",
     h2("Welcome to MetaWorks"),
     p("Your introduction and links go here.")
   ),
-
   nav_panel(
     title = "Create",
-
     layout_sidebar(
       sidebar = sidebar(
         actionButton("showUpload", "Upload"),
         actionButton("showSettings", "Settings"),
         actionButton("showReview", "Review")
       ),
-
       navset_hidden(
         id = "createPages",
         selected = "upload",
-
         nav_panel_hidden(
           value = "upload",
           h2("Upload"),
           p("Upload controls go here.")
         ),
-
         nav_panel_hidden(
           value = "settings",
           h2("Settings"),
           p("Configuration controls go here.")
         ),
-
         nav_panel_hidden(
           value = "review",
           h2("Review"),
@@ -44,40 +37,96 @@ ui <- page_navbar(
       )
     )
   ),
-
   nav_panel(
     title = "Runs",
-    
     layout_sidebar(
       sidebar = sidebar(
         actionButton("showDashboard", "Dashboard"),
         actionButton("showDownloadRuns", "Download Runs")
+      ),
+      navset_hidden(
+        id = "runPages",
+        selected = "dashboard",
+        nav_panel_hidden(
+          value = "dashboard",
+          h2("Dashboard"),
+          p("Info on past runs")
+        ),
+        nav_panel_hidden(
+          value = "downloadRuns",
+          h2("Download Runs"),
+          p("Download your runs here")
+        )
       )
     )
   ),
-
-
-
   nav_panel(
     title = "Help",
     layout_sidebar(
       sidebar = sidebar(
         actionButton("showSeqprep", "SEQPREP"),
         actionButton("showCutadapt", "CUTADAPT"),
-        actionButton("showVSearch", "VSEARCH"),
+        actionButton("showVsearch", "VSEARCH"),
         actionButton("showMarkers", "Markers"),
-        actionButton("showITSpart", "ITSpart"),
-        actionButton("showPsuedogeneFiltering", "Psuedogene Filtering"),
-        actionButton("showORFFinder", "ORFFINDER"),
+        actionButton("showItspart", "ITSpart"),
+        actionButton("showPseudogene", "Psuedogene Filtering"),
+        actionButton("showOrffinder", "ORFFINDER"),
         actionButton("showOther", "Other")
+      ),
+      navset_hidden(
+        id = "helpPages",
+        selected = "seqprep",
+        nav_panel_hidden(
+          value = "seqprep",
+          h2("SEQPREP"),
+          p("Help for SEQPREP settings will appear here.")
+        ),
+        nav_panel_hidden(
+          value = "cutadapt",
+          h2("CUTADAPT"),
+          p("Help for CUTADAPT settings will appear here.")
+        ),
+        nav_panel_hidden(
+          value = "vsearch",
+          h2("VSEARCH"),
+          p("Help for VSEARCH settings will appear here.")
+        ),
+        nav_panel_hidden(
+          value = "markers",
+          h2("Markers"),
+          p("Help for choosing a genetic marker will appear here.")
+        ),
+        nav_panel_hidden(
+          value = "itspart",
+          h2("ITSpart"),
+          p("Help for choosing an ITS region will appear here.")
+        ),
+        nav_panel_hidden(
+          value = "rdp",
+          h2("RDP"),
+          p("Help for RDP classifier settings will appear here.")
+        ),
+        nav_panel_hidden(
+          value = "pseudogene",
+          h2("Pseudogene Filtering"),
+          p("Help for pseudogene filtering will appear here.")
+        ),
+        nav_panel_hidden(
+          value = "orffinder",
+          h2("ORFFINDER"),
+          p("Help for ORFfinder settings will appear here.")
+        ),
+        nav_panel_hidden(
+          value = "other",
+          h2("Other"),
+          p("Additional help will appear here.")
+        )
       )
     )
-
   )
 )
 
 server <- function(input, output, session) {
-
   observeEvent(input$showUpload, {
     nav_select("createPages", selected = "upload")
   })
@@ -88,6 +137,51 @@ server <- function(input, output, session) {
 
   observeEvent(input$showReview, {
     nav_select("createPages", selected = "review")
+  })
+
+
+  observeEvent(input$showDashboard, {
+    nav_select("runPages", selected = "dashboard")
+  })
+
+  observeEvent(input$showDownloadRuns, {
+    nav_select("runPages", selected = "downloadRuns")
+  })
+
+  observeEvent(input$showSeqprep, {
+    nav_select("helpPages", selected = "seqprep")
+  })
+
+  observeEvent(input$showCutadapt, {
+    nav_select("helpPages", selected = "cutadapt")
+  })
+
+  observeEvent(input$showVsearch, {
+    nav_select("helpPages", selected = "vsearch")
+  })
+
+  observeEvent(input$showMarkers, {
+    nav_select("helpPages", selected = "markers")
+  })
+
+  observeEvent(input$showItspart, {
+    nav_select("helpPages", selected = "itspart")
+  })
+
+  observeEvent(input$showRdp, {
+    nav_select("helpPages", selected = "rdp")
+  })
+
+  observeEvent(input$showPseudogene, {
+    nav_select("helpPages", selected = "pseudogene")
+  })
+
+  observeEvent(input$showOrffinder, {
+    nav_select("helpPages", selected = "orffinder")
+  })
+
+  observeEvent(input$showOther, {
+    nav_select("helpPages", selected = "other")
   })
 }
 
