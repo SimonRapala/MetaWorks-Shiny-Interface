@@ -1,0 +1,22 @@
+.navbar{
+  background-color: #0B0F19;
+  min-height: 80px;
+}
+
+.navbar .navbar-brand{
+  color: #FFFFFF;
+}
+
+.navbar .navbar-nav .nav-item .nav-link.active{
+  color:#FFFFFF;
+  background-color: #1F2937;
+  padding: 7px 11px !important;
+
+  border: 1px solid #3B82F6;
+  border-radius: 8%;
+}
+
+.nav-item .nav-link{
+  background-color: #0B0F19;
+  color: #9CA3AF;
+}

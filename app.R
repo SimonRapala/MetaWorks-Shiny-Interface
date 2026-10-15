@@ -3,6 +3,20 @@ library(bslib)
 
 ui <- page_navbar(
   title = "MetaWorks 1.13",
+  nav_spacer(),
+  theme = bs_theme(
+    bg = "#FFFFFF",
+    fg = "#0B0F19",
+    primary = "#1F2937",
+    secondary = "#3B82F6",
+    base_font = "Arial"
+  ),
+  header = tags$head(
+    tags$link(
+      rel = "stylesheet",
+      href = "styles.css"
+    )
+  ),
   nav_panel(
     title = "Home",
     h2("Welcome to MetaWorks"),
@@ -127,6 +141,7 @@ ui <- page_navbar(
 )
 
 server <- function(input, output, session) {
+  #
   observeEvent(input$showUpload, {
     nav_select("createPages", selected = "upload")
   })
