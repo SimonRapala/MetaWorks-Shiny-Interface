@@ -1,52 +1,81 @@
 library(shiny)
 library(bslib)
 
-#Using bslib to better structure and control shiny
-ui <- page_sidebar(
-  title = "My dashboard",
+ui <- page_navbar(
+  title = "MetaWorks 1.13",
 
-  sidebar = sidebar(
-    actionButton("showHome", "Home"),
-    actionButton("showCreateJob", "Create Job"),
-    actionButton("showHistory", "Run History")
+  nav_panel(
+    title = "Home",
+    h2("Welcome to MetaWorks"),
+    p("Your introduction and links go here.")
   ),
 
-  navset_hidden(
-    id = "mainPages",
-    selected = "home",
+  nav_panel(
+    title = "Create",
 
-    nav_panel_hidden(
-      value = "home",
-      h2("Home"),
-      p("Welcome to MetaWorks.")
-    ),
+    layout_sidebar(
+      sidebar = sidebar(
+        actionButton("showUpload", "Upload"),
+        actionButton("showSettings", "Settings"),
+        actionButton("showReview", "Review")
+      ),
 
-    nav_panel_hidden(
-      value = "createJob",
-      h2("Create Job"),
-      p("Your upload controls will go here.")
-    ),
+      navset_hidden(
+        id = "createPages",
+        selected = "upload",
 
-    nav_panel_hidden(
-      value = "history",
-      h2("Run History"),
-      p("Your previous runs will appear here.")
+        nav_panel_hidden(
+          value = "upload",
+          h2("Upload"),
+          p("Upload controls go here.")
+        ),
+
+        nav_panel_hidden(
+          value = "settings",
+          h2("Settings"),
+          p("Configuration controls go here.")
+        ),
+
+        nav_panel_hidden(
+          value = "review",
+          h2("Review"),
+          p("Review your job before running it.")
+        )
+      )
     )
+  ),
+
+  nav_panel(
+    title = "Runs",
+    
+    layout_sidebar(
+      sidebar = sidebar(
+        actionButton("showDashboard", "Dashboard"),
+        actionButton("showDownloadRuns", "Download Runs")
+      )
+    )
+  ),
+
+
+
+  nav_panel(
+    title = "Help",
+
   )
 )
 
 server <- function(input, output, session) {
 
-  observeEvent(input$showHome, {
-    nav_select(id = "mainPages", selected = "home")
+  observeEvent(input$showUpload, {
+    nav_select("createPages", selected = "upload")
   })
 
-  observeEvent(input$showCreateJob, {
-    nav_select(id = "mainPages", selected = "createJob")
+  observeEvent(input$showSettings, {
+    nav_select("createPages", selected = "settings")
   })
 
-  observeEvent(input$showHistory, {
-    nav_select(id = "mainPages", selected = "history")
+  observeEvent(input$showReview, {
+    nav_select("createPages", selected = "review")
   })
 }
 
