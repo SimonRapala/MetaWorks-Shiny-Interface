@@ -1,10 +1,11 @@
 .navbar{
   background-color: #0B0F19;
-  min-height: 80px;
+  min-height: 110px;
 }
 
 .navbar .navbar-brand{
   color: #FFFFFF;
+  font-size: 22px;
 }
 
 .navbar .navbar-nav .nav-item .nav-link.active{
@@ -19,4 +20,16 @@
 .nav-item .nav-link{
   background-color: #0B0F19;
   color: #9CA3AF;
+  font-size: 17px;
+}
+
+.navbar .navbar-nav {
+  padding-right: 30px;
+  column-gap: 28px;
+}
+
+#homeTitle{
+  text-align: center;
+  margin-top: 3rem;
+  font-size: 46px;
 }

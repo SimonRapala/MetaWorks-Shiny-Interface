@@ -19,8 +19,7 @@ ui <- page_navbar(
   ),
   nav_panel(
     title = "Home",
-    h2("Welcome to MetaWorks"),
-    p("Your introduction and links go here.")
+    h2("Welcome", br(), "to MetaWorks", id = "homeTitle"),
   ),
   nav_panel(
     title = "Create",
