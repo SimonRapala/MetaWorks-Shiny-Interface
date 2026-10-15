@@ -60,6 +60,18 @@ ui <- page_navbar(
 
   nav_panel(
     title = "Help",
+    layout_sidebar(
+      sidebar = sidebar(
+        actionButton("showSeqprep", "SEQPREP"),
+        actionButton("showCutadapt", "CUTADAPT"),
+        actionButton("showVSearch", "VSEARCH"),
+        actionButton("showMarkers", "Markers"),
+        actionButton("showITSpart", "ITSpart"),
+        actionButton("showPsuedogeneFiltering", "Psuedogene Filtering"),
+        actionButton("showORFFinder", "ORFFINDER"),
+        actionButton("showOther", "Other")
+      )
+    )
 
   )
 )
