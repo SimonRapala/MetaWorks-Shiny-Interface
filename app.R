@@ -19,11 +19,24 @@ ui <- page_navbar(
     )
   ),
   nav_panel(
+    col_widths = breakpoints(
+      md = c(4, 8)
+    ),
     title = "Home",
     value = "home",
-    h2("Welcome", br(), "to the MetaWorks", br(),
-      "Interface",
-      id = "homeTitle"
+    layout_columns(
+      class = "titleContainer",
+      h2("Welcome", br(), "to the MetaWorks", br(),
+        "Interface",
+        id = "homeTitle"
+      ),
+
+      p("This app is intended as a interface to complement
+      to MetaWorks v1.13. The interface simplifies the process of
+      running MetaWorks from the CLI to a more user friendly approach.
+      Keeping aggregate data and allowing users to easily tune thier runs
+      to thier need.", id = "titleBlurb")
+
     ),
     layout_columns(
       col_widths = breakpoints(
@@ -42,7 +55,7 @@ ui <- page_navbar(
       card(
         class = "homeCardRuns homeCard",
         card_body(
-          p("Browse previous runs as well as overall overhead cost and 
+          p("Browse previous runs as well as overall overhead cost and
           statistic tracking, reviewing settigns and files as well
           as downloading historical results"),
           actionButton("homeButtonRun", "Runs")
@@ -52,7 +65,7 @@ ui <- page_navbar(
         class = "homeCardHelp homeCard",
         card_body(
           p("Learn what each setting controls and how it can be changed,
-          explore default as well as min and max values, ad find guidance 
+          explore default as well as min and max values, ad find guidance
           on how to configure your run"),
           actionButton("homeButtonHelp", "Help")
         )

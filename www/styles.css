@@ -29,11 +29,24 @@
   row-gap: 30px;
 }
 
+
+.titleContainer{
+  margin-top: 8px;
+}
+
 #homeTitle{
   text-align: center;
-  margin-top: 3rem;
+  margin-top: auto;
+  margin-bottom: auto;
   font-size: 46px;
 }
+
+#titleBlurb{
+  margin-top: auto;
+  margin-bottom: auto;
+  text-align: center;
+}
+
 
 .homeCardsContainer{
   margin: auto !important;
