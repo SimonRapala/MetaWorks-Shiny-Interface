@@ -21,37 +21,39 @@ ui <- page_navbar(
   nav_panel(
     title = "Home",
     value = "home",
-    h2("Welcome", br(), "to the MetaWorks", br(), 
-    "Interface", id = "homeTitle"),
+    h2("Welcome", br(), "to the MetaWorks", br(),
+      "Interface",
+      id = "homeTitle"
+    ),
     layout_columns(
       col_widths = breakpoints(
         md = c(4, 4, 4)
       ),
       fill = FALSE,
       class = "homeCardsContainer",
-
       card(
         class = "homeCardCreate homeCard",
         card_body(
-          p("Create a brand new run with your own personalized 
-          config settings and files uploaded."),
+          p("Upload your sequence files, configure your settings and
+          prepare a new MetaWorks run for processing"),
           actionButton("homeButtonCreate", "Create")
         )
       ),
       card(
         class = "homeCardRuns homeCard",
         card_body(
-          p("Download your past run information for recreate, store or 
-          analyze results. Look at aggregate averages and tracked results"),
+          p("Browse previous runs as well as overall overhead cost and 
+          statistic tracking, reviewing settigns and files as well
+          as downloading historical results"),
           actionButton("homeButtonRun", "Runs")
         )
       ),
       card(
         class = "homeCardHelp homeCard",
         card_body(
-          p("Find detailed information cards on each setting, 
-          their minimum and maximum values, defaults and what 
-          the setting does when applied to the MetaWorks process"),
+          p("Learn what each setting controls and how it can be changed,
+          explore default as well as min and max values, ad find guidance 
+          on how to configure your run"),
           actionButton("homeButtonHelp", "Help")
         )
       )
