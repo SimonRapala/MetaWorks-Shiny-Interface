@@ -3,6 +3,7 @@ library(bslib)
 
 ui <- page_navbar(
   title = "MetaWorks 1.13",
+  id = "mainNavbar",
   nav_spacer(),
   theme = bs_theme(
     bg = "#FFFFFF",
@@ -19,6 +20,7 @@ ui <- page_navbar(
   ),
   nav_panel(
     title = "Home",
+    value = "home",
     h2("Welcome", br(), "to the MetaWorks", br(), 
     "Interface", id = "homeTitle"),
     layout_columns(
@@ -26,34 +28,38 @@ ui <- page_navbar(
         md = c(4, 4, 4)
       ),
       fill = FALSE,
-      class = "homeCards",
+      class = "homeCardsContainer",
 
       card(
-        class = "homeCardCreate",
+        class = "homeCardCreate homeCard",
         card_body(
           p("Create a brand new run with your own personalized 
-          config settings and files uploaded.")
+          config settings and files uploaded."),
+          actionButton("homeButtonCreate", "Create")
         )
       ),
       card(
-        class = "homeCardRuns",
+        class = "homeCardRuns homeCard",
         card_body(
           p("Download your past run information for recreate, store or 
-          analyze results. Look at aggregate averages and tracked results")
+          analyze results. Look at aggregate averages and tracked results"),
+          actionButton("homeButtonRun", "Runs")
         )
       ),
       card(
-        class = "homeCardHelp",
+        class = "homeCardHelp homeCard",
         card_body(
           p("Find detailed information cards on each setting, 
           their minimum and maximum values, defaults and what 
-          the setting does when applied to the MetaWorks process")
+          the setting does when applied to the MetaWorks process"),
+          actionButton("homeButtonHelp", "Help")
         )
       )
     )
   ),
   nav_panel(
     title = "Create",
+    value = "create",
     layout_sidebar(
       sidebar = sidebar(
         open = "closed",
@@ -84,6 +90,7 @@ ui <- page_navbar(
   ),
   nav_panel(
     title = "Runs",
+    value = "runs",
     layout_sidebar(
       sidebar = sidebar(
         open = "closed",
@@ -108,6 +115,7 @@ ui <- page_navbar(
   ),
   nav_panel(
     title = "Help",
+    value = "help",
     layout_sidebar(
       sidebar = sidebar(
         open = "closed",
@@ -230,6 +238,18 @@ server <- function(input, output, session) {
 
   observeEvent(input$showOther, {
     nav_select("helpPages", selected = "other")
+  })
+
+  observeEvent(input$homeButtonCreate, {
+    nav_select("mainNavbar", selected = "create")
+  })
+
+  observeEvent(input$homeButtonRun, {
+    nav_select("mainNavbar", selected = "runs")
+  })
+
+  observeEvent(input$homeButtonHelp, {
+    nav_select("mainNavbar", selected = "help")
   })
 }
 
