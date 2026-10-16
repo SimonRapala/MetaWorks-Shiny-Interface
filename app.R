@@ -19,12 +19,44 @@ ui <- page_navbar(
   ),
   nav_panel(
     title = "Home",
-    h2("Welcome", br(), "to MetaWorks", id = "homeTitle"),
+    h2("Welcome", br(), "to the MetaWorks", br(), 
+    "Interface", id = "homeTitle"),
+    layout_columns(
+      col_widths = breakpoints(
+        md = c(4, 4, 4)
+      ),
+      fill = FALSE,
+      class = "homeCards",
+
+      card(
+        class = "homeCardCreate",
+        card_body(
+          p("Create a brand new run with your own personalized 
+          config settings and files uploaded.")
+        )
+      ),
+      card(
+        class = "homeCardRuns",
+        card_body(
+          p("Download your past run information for recreate, store or 
+          analyze results. Look at aggregate averages and tracked results")
+        )
+      ),
+      card(
+        class = "homeCardHelp",
+        card_body(
+          p("Find detailed information cards on each setting, 
+          their minimum and maximum values, defaults and what 
+          the setting does when applied to the MetaWorks process")
+        )
+      )
+    )
   ),
   nav_panel(
     title = "Create",
     layout_sidebar(
       sidebar = sidebar(
+        open = "closed",
         actionButton("showUpload", "Upload"),
         actionButton("showSettings", "Settings"),
         actionButton("showReview", "Review")
@@ -54,6 +86,7 @@ ui <- page_navbar(
     title = "Runs",
     layout_sidebar(
       sidebar = sidebar(
+        open = "closed",
         actionButton("showDashboard", "Dashboard"),
         actionButton("showDownloadRuns", "Download Runs")
       ),
@@ -77,6 +110,7 @@ ui <- page_navbar(
     title = "Help",
     layout_sidebar(
       sidebar = sidebar(
+        open = "closed",
         actionButton("showSeqprep", "SEQPREP"),
         actionButton("showCutadapt", "CUTADAPT"),
         actionButton("showVsearch", "VSEARCH"),
