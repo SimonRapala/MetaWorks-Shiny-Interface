@@ -66,7 +66,7 @@ ui <- page_navbar(
         class = "homeCardHelp homeCard",
         card_body(
           p("Learn what each setting controls and how it can be changed,
-          explore default as well as min and max values, ad find guidance
+          explore default as well as min and max values, and find guidance
           on how to configure your run"),
           actionButton("homeButtonHelp", "Help")
         )
@@ -91,24 +91,33 @@ ui <- page_navbar(
           layout_columns(
             id = "uploadLayout",
             col_widths = breakpoints(
-              md = c(6, 6)
+              md = c(6, 6, 12)
             ),
             card(
-              class = "fastqUploadCard",
+              class = "fastqUploadCard createCard",
               card_body(
-                h3("Select the raw sequence reads you would like to process 
-                (FASTQ format)"),
-                actionButton()
+                h3("Select the raw sequence reads you would like to process",
+                   br(), "(FASTQ format)"),
+                actionButton(inputId = "fastqUploadButton", label = "Browse")
               )
             ),
 
             card(
-              class = "fastaUploadCard",
+              class = "fastaUploadCard createCard",
               card_body(
                 h3("Select the adapter FASTA file"),
-                actionButton()
+                actionButton(inputId = "fastaUploadButton", label = "Browse")
               )
-
+            ),
+            card(
+              class = "uploadLog",
+              card_body(
+                h4("Upload Log"),
+                verbatimTextOutput(
+                  outputId = "uploadLogText",
+                  placeholder = TRUE
+                )
+              )
             )
 
           )
