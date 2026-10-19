@@ -26,6 +26,7 @@ ui <- page_navbar(
     value = "home",
     layout_columns(
       class = "titleContainer",
+      fill = FALSE,
       h2("Welcome", br(), "to the MetaWorks", br(),
         "Interface",
         id = "homeTitle"
@@ -34,8 +35,8 @@ ui <- page_navbar(
       p("This app is intended as a interface to complement
       to MetaWorks v1.13. The interface simplifies the process of
       running MetaWorks from the CLI to a more user friendly approach.
-      Keeping aggregate data and allowing users to easily tune thier runs
-      to thier need.", id = "titleBlurb")
+      Keeping aggregate data and allowing users to easily tune their runs
+      to their need.", id = "titleBlurb")
 
     ),
     layout_columns(
