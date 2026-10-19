@@ -1,10 +1,16 @@
+#Loading in the libraries used
 library(shiny)
 library(bslib)
 
+#The actual HTML and CSS displayed
 ui <- page_navbar(
+  #Title on the page
   title = "MetaWorks 1.13",
+  #how to target and change CSS of the section
   id = "mainNavbar",
+  #Moves the navbar options to the right
   nav_spacer(),
+  #A general theme for the page to follow
   theme = bs_theme(
     bg = "#FFFFFF",
     fg = "#0B0F19",
@@ -12,44 +18,54 @@ ui <- page_navbar(
     secondary = "#3B82F6",
     base_font = "Arial"
   ),
+  #Imports the stylesheet allowing changing of the CSS
   header = tags$head(
     tags$link(
       rel = "stylesheet",
       href = "styles.css"
     )
   ),
+  #Panels allow user to click and select the navbar options
+  #changing displayed screen
   nav_panel(
-    col_widths = breakpoints(
-      md = c(4, 8)
-    ),
+    #The name of the navbar option
     title = "Home",
+    #Allows for targeting selection when button is clicked
     value = "home",
+    #Gives the Title and Title header thier spacing
     layout_columns(
+      col_widths = breakpoints(
+        md = c(4, 8)
+      ),
       class = "titleContainer",
       fill = FALSE,
+      #Title
       h2("Welcome", br(), "to the MetaWorks", br(),
         "Interface",
         id = "homeTitle"
       ),
-
+      #Title header
       p("This app is intended as a interface to complement
       to MetaWorks v1.13. The interface simplifies the process of
       running MetaWorks from the CLI to a more user friendly approach.
       Keeping aggregate data and allowing users to easily tune their runs
       to their need.", id = "titleBlurb")
-
     ),
+    #Gives the 3 cards thier spacing
     layout_columns(
       col_widths = breakpoints(
         md = c(4, 4, 4)
       ),
       fill = FALSE,
       class = "homeCardsContainer",
+      #Each of the hold 2 elements that are flexboxed vertically
       card(
         class = "homeCardCreate homeCard",
         card_body(
+          #Description
           p("Upload your sequence files, configure your settings and
           prepare a new MetaWorks run for processing"),
+          #Button to allow alt movement to different navbar tabs
           actionButton("homeButtonCreate", "Create")
         )
       ),
@@ -76,6 +92,8 @@ ui <- page_navbar(
   nav_panel(
     title = "Create",
     value = "create",
+    #Creates the sidebar, starts collapsed, 
+    #has 3 buttons for tabs inside the navbar option
     layout_sidebar(
       sidebar = sidebar(
         open = "closed",
@@ -83,8 +101,10 @@ ui <- page_navbar(
         actionButton("showSettings", "Settings"),
         actionButton("showReview", "Review")
       ),
+      #These are hidden pages that are loaded in when button is pressed
       navset_hidden(
         id = "createPages",
+        #Allows for observer to select this option
         selected = "upload",
         nav_panel_hidden(
           value = "upload",
@@ -96,12 +116,13 @@ ui <- page_navbar(
             card(
               class = "fastqUploadCard createCard",
               card_body(
-                h3("Select the raw sequence reads you would like to process",
-                   br(), "(FASTQ format)"),
+                h3(
+                  "Select the raw sequence reads you would like to process",
+                  br(), "(FASTQ format)"
+                ),
                 actionButton(inputId = "fastqUploadButton", label = "Browse")
               )
             ),
-
             card(
               class = "fastaUploadCard createCard",
               card_body(
@@ -119,7 +140,6 @@ ui <- page_navbar(
                 )
               )
             )
-
           )
         ),
         nav_panel_hidden(
@@ -229,7 +249,7 @@ ui <- page_navbar(
 )
 
 server <- function(input, output, session) {
-  #
+  #Observers that allow use of create sidebar buttons
   observeEvent(input$showUpload, {
     nav_select("createPages", selected = "upload")
   })
@@ -243,6 +263,8 @@ server <- function(input, output, session) {
   })
 
 
+
+  #Observers that allow use of runs sidebar button
   observeEvent(input$showDashboard, {
     nav_select("runPages", selected = "dashboard")
   })
@@ -251,6 +273,7 @@ server <- function(input, output, session) {
     nav_select("runPages", selected = "downloadRuns")
   })
 
+  #Observers that allow user of help sidebar buttons
   observeEvent(input$showSeqprep, {
     nav_select("helpPages", selected = "seqprep")
   })
@@ -287,6 +310,7 @@ server <- function(input, output, session) {
     nav_select("helpPages", selected = "other")
   })
 
+  #Observers that allow the use of the buttons on the homepage cards
   observeEvent(input$homeButtonCreate, {
     nav_select("mainNavbar", selected = "create")
   })
