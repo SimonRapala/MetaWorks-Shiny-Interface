@@ -336,12 +336,11 @@ server <- function(input, output, session) {
 
   #The checks and validation for the file uploads in Create
   output$uploadLogText <- renderText({
-    req(input$fastqUploadButton)
-    req(input$fastaUploadButton)
     filenames <- c(
       input$fastqUploadButton$name,
       input$fastaUploadButton$name
     )
+    req(length(filenames) > 0)
     validate(
       need(
         anyDuplicated(filenames) == 0,
