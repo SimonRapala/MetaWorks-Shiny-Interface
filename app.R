@@ -1,6 +1,8 @@
 #Loading in the libraries used
 library(shiny)
 library(bslib)
+#Allows the use of external R files
+source("R/fileValidation.R")
 
 #The actual HTML and CSS displayed
 ui <- page_navbar(
@@ -120,14 +122,18 @@ ui <- page_navbar(
                   "Select the raw sequence reads you would like to process",
                   br(), "(FASTQ format)"
                 ),
-                actionButton(inputId = "fastqUploadButton", label = "Browse")
+                fileInput(inputId = "fastqUploadButton",
+                          multiple = TRUE, label = "",
+                          accept = "fastq.gz")
               )
             ),
             card(
               class = "fastaUploadCard createCard",
               card_body(
                 h3("Select the adapter FASTA file"),
-                actionButton(inputId = "fastaUploadButton", label = "Browse")
+                fileInput(inputId = "fastaUploadButton", 
+                          multiple = FALSE, label = "",
+                          accept = ".fasta")
               )
             ),
             card(
@@ -322,6 +328,31 @@ server <- function(input, output, session) {
   observeEvent(input$homeButtonHelp, {
     nav_select("mainNavbar", selected = "help")
   })
+
+
+
+
+
+
+  #The checks and validation for the file uploads in Create
+  output$uploadLogText <- renderText({
+    req(input$fastqUploadButton)
+    req(input$fastaUploadButton)
+    filenames <- c(
+      input$fastqUploadButton$name,
+      input$fastaUploadButton$name
+    )
+    validate(
+      need(
+        anyDuplicated(filenames) == 0,
+        "Duplicate file names are not permitted"
+      )
+    )
+
+    result <- checkFastQFiles(filenames)
+    paste(result$outputLog, collapse = "\n")
+  })
+
 }
 
 shinyApp(ui = ui, server = server)

@@ -94,12 +94,20 @@
 
 
 
-.createCard .action-button {
-  margin-top: auto;
-  margin-bottom: auto;
-  align-self: center;
+.createCard .shiny-input-container {
   width: 200px;
   max-width: 100%;
+  margin: auto;
+}
+
+.createCard .input-group input[type="text"] {
+  display: none;
+}
+
+
+.createCard .input-group-btn,
+.createCard .btn-file {
+  width: 100%;
 }
 
 
