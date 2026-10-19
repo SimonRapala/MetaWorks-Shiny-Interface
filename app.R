@@ -57,7 +57,7 @@ ui <- page_navbar(
         class = "homeCardRuns homeCard",
         card_body(
           p("Browse previous runs as well as overall overhead cost and
-          statistic tracking, reviewing settigns and files as well
+          statistic tracking, reviewing settings and files as well
           as downloading historical results"),
           actionButton("homeButtonRun", "Runs")
         )
@@ -88,8 +88,30 @@ ui <- page_navbar(
         selected = "upload",
         nav_panel_hidden(
           value = "upload",
-          h2("Upload"),
-          p("Upload controls go here.")
+          layout_columns(
+            id = "uploadLayout",
+            col_widths = breakpoints(
+              md = c(6, 6)
+            ),
+            card(
+              class = "fastqUploadCard",
+              card_body(
+                h3("Select the raw sequence reads you would like to process 
+                (FASTQ format)"),
+                actionButton()
+              )
+            ),
+
+            card(
+              class = "fastaUploadCard",
+              card_body(
+                h3("Select the adapter FASTA file"),
+                actionButton()
+              )
+
+            )
+
+          )
         ),
         nav_panel_hidden(
           value = "settings",
