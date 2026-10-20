@@ -1,29 +1,35 @@
+#Importing the needed library
 library(testthat)
+#Where the function is located
 source("../R/fileValidation.R")
 
+#A pure positive test to check intended results, PASS
 test_that(
   desc = "A complete pair and adapter file are accepted",
   code = {
+    #The fake file names being provided
     filenames <- c(
       "sample_R1_001.fastq.gz",
       "sample_R2_001.fastq.gz",
       "adapters.fasta"
     )
-
+    #Where the returned list is stored
     results <- checkFastQFiles(filenames)
-
+    #The retured result and the expected result for FASTQ
     expect_equal(
       object = results$fastqPairs,
       expected = c("sample_R1_001.fastq.gz", "sample_R2_001.fastq.gz")
     )
+    #The returned result and expected result for FASTA
     expect_equal(
       object = results$adapterFile,
       expected = "adapters.fasta"
     )
+    #Logical check for truthy value
     expect_true(results$complete)
   }
 )
-
+#Tests correct FASTQ and a incorrect FASTA file, FAIL
 test_that(
   desc = "A complete pair and incorrect adapter file",
   code = {
@@ -43,11 +49,12 @@ test_that(
       object = results$adapterFile,
       expected = character(0)
     )
+    #Logical check for falsy value
     expect_false(results$complete)
   }
 )
 
-
+#Two reads from different samples and corrrect FASTA, FAIL
 test_that(
   desc = "A non complete set and correct adapter file are not accepted",
   code = {
@@ -71,7 +78,7 @@ test_that(
   }
 )
 
-
+#Both an incomplete set of pairs and a incorrect FASTA, FAIL
 test_that(
   desc = "A incomplete pair and incorrect adapter file are not accepted",
   code = {
@@ -94,7 +101,7 @@ test_that(
     expect_false(results$complete)
   }
 )
-
+#No FASTQ files with a correct FASTA, FAIL
 test_that(
   desc = "Only a correct adapter file, are not accepted",
   code = {
@@ -115,7 +122,7 @@ test_that(
     expect_false(results$complete)
   }
 )
-
+#A pair of reads with no FASTA, FAIL
 test_that(
   desc = "Only a complete pair no adapter, not accepted",
   code = {
@@ -141,6 +148,7 @@ test_that(
   }
 )
 
+#A stress test for many complete pairs with valid FASTA, PASS
 test_that(
   desc = "Lots of complete pairs and an adapter file are accepted",
   code = {
@@ -192,9 +200,10 @@ test_that(
 )
 
 
-
+#All pairs are complete except one with a valid FASTA, FAIL
 test_that(
-  desc = "Lots of complete pairs 1 incomplete and an adapter file, not accepted",
+  desc = "Lots of complete pairs 1 incomplete 
+  and an adapter file, not accepted",
   code = {
     filenames <- c(
       "sample_R1_001.fastq.gz",
