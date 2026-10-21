@@ -1,18 +1,18 @@
-#Loading in the libraries used
+# Loading in the libraries used
 library(shiny)
 library(bslib)
-#Allows the use of external R files
+# Allows the use of external R files
 source("R/fileValidation.R")
 
-#The actual HTML and CSS displayed
+# The actual HTML and CSS displayed
 ui <- page_navbar(
-  #Title on the page
+  # Title on the page
   title = "MetaWorks 1.13",
-  #how to target and change CSS of the section
+  # how to target and change CSS of the section
   id = "mainNavbar",
-  #Moves the navbar options to the right
+  # Moves the navbar options to the right
   nav_spacer(),
-  #A general theme for the page to follow
+  # A general theme for the page to follow
   theme = bs_theme(
     bg = "#FFFFFF",
     fg = "#0B0F19",
@@ -20,54 +20,54 @@ ui <- page_navbar(
     secondary = "#3B82F6",
     base_font = "Arial"
   ),
-  #Imports the stylesheet allowing changing of the CSS
+  # Imports the stylesheet allowing changing of the CSS
   header = tags$head(
     tags$link(
       rel = "stylesheet",
       href = "styles.css"
     )
   ),
-  #Panels allow user to click and select the navbar options
-  #changing displayed screen
+  # Panels allow user to click and select the navbar options
+  # changing displayed screen
   nav_panel(
-    #The name of the navbar option
+    # The name of the navbar option
     title = "Home",
-    #Allows for targeting selection when button is clicked
+    # Allows for targeting selection when button is clicked
     value = "home",
-    #Gives the Title and Title header thier spacing
+    # Gives the Title and Title header thier spacing
     layout_columns(
       col_widths = breakpoints(
         md = c(4, 8)
       ),
       class = "titleContainer",
       fill = FALSE,
-      #Title
+      # Title
       h2("Welcome", br(), "to the MetaWorks", br(),
         "Interface",
         id = "homeTitle"
       ),
-      #Title header
+      # Title header
       p("This app is intended as a interface to complement
       to MetaWorks v1.13. The interface simplifies the process of
       running MetaWorks from the CLI to a more user friendly approach.
       Keeping aggregate data and allowing users to easily tune their runs
       to their need.", id = "titleBlurb")
     ),
-    #Gives the 3 cards thier spacing
+    # Gives the 3 cards thier spacing
     layout_columns(
       col_widths = breakpoints(
         md = c(4, 4, 4)
       ),
       fill = FALSE,
       class = "homeCardsContainer",
-      #Each of the hold 2 elements that are flexboxed vertically
+      # Each of the hold 2 elements that are flexboxed vertically
       card(
         class = "homeCardCreate homeCard",
         card_body(
-          #Description
+          # Description
           p("Upload your sequence files, configure your settings and
           prepare a new MetaWorks run for processing"),
-          #Button to allow alt movement to different navbar tabs
+          # Button to allow alt movement to different navbar tabs
           actionButton("homeButtonCreate", "Create")
         )
       ),
@@ -94,8 +94,8 @@ ui <- page_navbar(
   nav_panel(
     title = "Create",
     value = "create",
-    #Creates the sidebar, starts collapsed, 
-    #has 3 buttons for tabs inside the navbar option
+    # Creates the sidebar, starts collapsed,
+    # has 3 buttons for tabs inside the navbar option
     layout_sidebar(
       sidebar = sidebar(
         open = "closed",
@@ -103,10 +103,10 @@ ui <- page_navbar(
         actionButton("showSettings", "Settings"),
         actionButton("showReview", "Review")
       ),
-      #These are hidden pages that are loaded in when button is pressed
+      # These are hidden pages that are loaded in when button is pressed
       navset_hidden(
         id = "createPages",
-        #Allows for observer to select this option
+        # Allows for observer to select this option
         selected = "upload",
         nav_panel_hidden(
           value = "upload",
@@ -122,18 +122,22 @@ ui <- page_navbar(
                   "Select the raw sequence reads you would like to process",
                   br(), "(FASTQ format)"
                 ),
-                fileInput(inputId = "fastqUploadButton",
-                          multiple = TRUE, label = "",
-                          accept = "fastq.gz")
+                fileInput(
+                  inputId = "fastqUploadButton",
+                  multiple = TRUE, label = "",
+                  accept = "fastq.gz"
+                )
               )
             ),
             card(
               class = "fastaUploadCard createCard",
               card_body(
                 h3("Select the adapter FASTA file"),
-                fileInput(inputId = "fastaUploadButton", 
-                          multiple = FALSE, label = "",
-                          accept = ".fasta")
+                fileInput(
+                  inputId = "fastaUploadButton",
+                  multiple = FALSE, label = "",
+                  accept = ".fasta"
+                )
               )
             ),
             card(
@@ -151,7 +155,140 @@ ui <- page_navbar(
         nav_panel_hidden(
           value = "settings",
           h2("Settings"),
-          p("Configuration controls go here.")
+          navset_pill(
+            id = "settingsTabs",
+            nav_panel(
+              title = "SEQPREP",
+              layout_columns(
+                col_widths = breakpoints(
+                  md = c(6, 6, 6, 6, 12)
+                ),
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "Phred Quality Cutoff",
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Minimum base quality accepted during
+                      read merging. Increase for stricter accuracy with
+                      high-quality data; decrease when retaining
+                      lower-quality reads is more important.
+                      [Min: 0; Default: 13; Max: 40]"
+                    )
+                  ),
+                  card_body(
+                    numericInput(
+                      inputId = "phredQualityCutoff",
+                      label = "Phred Quality Cutoff",
+                      value = 13,
+                      min = 0,
+                      max = 40,
+                      step = 1
+                    )
+                  )
+                ),
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "Minimum Read Overlap",
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Minimum overlapping bases
+                      required to merge paired reads. Increase
+                      for greater merging confidence; decrease
+                      for longer amplicons with limited overlap.
+                      [Min: 10 bp; Default: 25 bp;
+                      Max: 100 bp]"
+                    )
+                  ),
+                  card_body(
+                    numericInput(
+                      inputId = "minimumReadOverlap",
+                      label = "Minimum Read Overlap",
+                      value = 25,
+                      min = 10,
+                      max = 100,
+                      step = 1
+                    )
+                  )
+                ),
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "Maximum Mismatch Fraction",
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Maximum fraction of mismatched bases
+                      allowed in the overlap. Decrease for stricter
+                      error control; increase slightly for lower-quality data.
+                      [Min: 0; Default: 0.02; Max: 0.2]"
+                    )
+                  ),
+                  card_body(
+                    numericInput(
+                      inputId = "maximumMismatchFraction",
+                      label = "Maximum Mismatch Fraction",
+                      value = 0.02,
+                      min = 0,
+                      max = 0.2,
+                      step = 0.01
+                    )
+                  )
+                ),
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "Minimum Matching-Overlap Fraction",
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Minimum fraction of overlapping bases that
+                      must agree. Increase to prioritize accuracy; decrease
+                      to retain more reads from lower-quality runs.
+                      [Min: 0.70; Default: 0.90; Max: 1.00]"
+                    )
+                  ),
+                  card_body(
+                    numericInput(
+                      inputId = "minimumMatchOverlapFraction",
+                      label = "Minimum Match-Overlap Fraction",
+                      value = 0.9,
+                      min = 0.7,
+                      max = 1.0,
+                      step = 0.01
+                    )
+                  )
+                ),
+                card(
+                  class = "seqprepLog",
+                  card_header(
+                    h4("SEQPREP Log")
+                  ),
+                  card_body(
+                    verbatimTextOutput(
+                      outputId = "uploadLogText",
+                      placeholder = TRUE
+                    )
+                  )
+                )
+              )
+            ),
+            nav_panel(
+              title = "CUTADAPT",
+              p("Primer-trimming settings")
+            ),
+            nav_panel(
+              title = "VSEARCH",
+              p("Denoising settings")
+            ),
+            nav_panel(
+              title = "Classification",
+              p("Marker and RDP settings")
+            ),
+            nav_panel(
+              title = "Pseudogene filtering",
+              p("Pseudogene and ORFfinder settings")
+            )
+          )
         ),
         nav_panel_hidden(
           value = "review",
@@ -255,7 +392,7 @@ ui <- page_navbar(
 )
 
 server <- function(input, output, session) {
-  #Observers that allow use of create sidebar buttons
+  # Observers that allow use of create sidebar buttons
   observeEvent(input$showUpload, {
     nav_select("createPages", selected = "upload")
   })
@@ -269,8 +406,7 @@ server <- function(input, output, session) {
   })
 
 
-
-  #Observers that allow use of runs sidebar button
+  # Observers that allow use of runs sidebar button
   observeEvent(input$showDashboard, {
     nav_select("runPages", selected = "dashboard")
   })
@@ -279,7 +415,7 @@ server <- function(input, output, session) {
     nav_select("runPages", selected = "downloadRuns")
   })
 
-  #Observers that allow user of help sidebar buttons
+  # Observers that allow user of help sidebar buttons
   observeEvent(input$showSeqprep, {
     nav_select("helpPages", selected = "seqprep")
   })
@@ -316,7 +452,7 @@ server <- function(input, output, session) {
     nav_select("helpPages", selected = "other")
   })
 
-  #Observers that allow the use of the buttons on the homepage cards
+  # Observers that allow the use of the buttons on the homepage cards
   observeEvent(input$homeButtonCreate, {
     nav_select("mainNavbar", selected = "create")
   })
@@ -330,11 +466,7 @@ server <- function(input, output, session) {
   })
 
 
-
-
-
-
-  #The checks and validation for the file uploads in Create
+  # The checks and validation for the file uploads in Create
   output$uploadLogText <- renderText({
     filenames <- c(
       input$fastqUploadButton$name,
@@ -351,7 +483,6 @@ server <- function(input, output, session) {
     result <- checkFastQFiles(filenames)
     paste(result$outputLog, collapse = "\n")
   })
-
 }
 
 shinyApp(ui = ui, server = server)
