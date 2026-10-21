@@ -172,18 +172,20 @@ ui <- page_navbar(
                       "Minimum base quality accepted during
                       read merging. Increase for stricter accuracy with
                       high-quality data; decrease when retaining
-                      lower-quality reads is more important.
-                      [Min: 0; Default: 13; Max: 40]"
+                      lower-quality reads is more important."
                     )
                   ),
                   card_body(
-                    numericInput(
-                      inputId = "phredQualityCutoff",
-                      label = "Phred Quality Cutoff",
-                      value = 13,
-                      min = 0,
-                      max = 40,
-                      step = 1
+                    div(
+                      class = "labelsBelow",
+                      numericInput(
+                        inputId = "phredQualityCutoff",
+                        label = "[Min: 0; Default: 13; Max: 40]",
+                        value = 13,
+                        min = 0,
+                        max = 40,
+                        step = 1
+                      )
                     )
                   )
                 ),
@@ -196,19 +198,20 @@ ui <- page_navbar(
                       "Minimum overlapping bases
                       required to merge paired reads. Increase
                       for greater merging confidence; decrease
-                      for longer amplicons with limited overlap.
-                      [Min: 10 bp; Default: 25 bp;
-                      Max: 100 bp]"
+                      for longer amplicons with limited overlap."
                     )
                   ),
                   card_body(
-                    numericInput(
-                      inputId = "minimumReadOverlap",
-                      label = "Minimum Read Overlap",
-                      value = 25,
-                      min = 10,
-                      max = 100,
-                      step = 1
+                    div(
+                      class = "labelsBelow",
+                      numericInput(
+                        inputId = "minimumReadOverlap",
+                        label = "[Min: 10 bp; Default: 25 bp; Max: 100 bp]",
+                        value = 25,
+                        min = 10,
+                        max = 100,
+                        step = 1
+                      )
                     )
                   )
                 ),
@@ -220,18 +223,20 @@ ui <- page_navbar(
                       icon("circle-question", class = "toolTip"),
                       "Maximum fraction of mismatched bases
                       allowed in the overlap. Decrease for stricter
-                      error control; increase slightly for lower-quality data.
-                      [Min: 0; Default: 0.02; Max: 0.2]"
+                      error control; increase slightly for lower-quality data."
                     )
                   ),
                   card_body(
-                    numericInput(
-                      inputId = "maximumMismatchFraction",
-                      label = "Maximum Mismatch Fraction",
-                      value = 0.02,
-                      min = 0,
-                      max = 0.2,
-                      step = 0.01
+                    div(
+                      class = "labelsBelow",
+                      numericInput(
+                        inputId = "maximumMismatchFraction",
+                        label = "[Min: 0; Default: 0.02; Max: 0.2]",
+                        value = 0.02,
+                        min = 0,
+                        max = 0.2,
+                        step = 0.01
+                      )
                     )
                   )
                 ),
@@ -243,18 +248,20 @@ ui <- page_navbar(
                       icon("circle-question", class = "toolTip"),
                       "Minimum fraction of overlapping bases that
                       must agree. Increase to prioritize accuracy; decrease
-                      to retain more reads from lower-quality runs.
-                      [Min: 0.70; Default: 0.90; Max: 1.00]"
+                      to retain more reads from lower-quality runs."
                     )
                   ),
                   card_body(
-                    numericInput(
-                      inputId = "minimumMatchOverlapFraction",
-                      label = "Minimum Match-Overlap Fraction",
-                      value = 0.9,
-                      min = 0.7,
-                      max = 1.0,
-                      step = 0.01
+                    div(
+                      class = "labelsBelow",
+                      numericInput(
+                        inputId = "minimumMatchOverlapFraction",
+                        label = "[Min: 0.70; Default: 0.90; Max: 1.00]",
+                        value = 0.9,
+                        min = 0.7,
+                        max = 1.0,
+                        step = 0.01
+                      )
                     )
                   )
                 ),
@@ -265,7 +272,7 @@ ui <- page_navbar(
                   ),
                   card_body(
                     verbatimTextOutput(
-                      outputId = "uploadLogText",
+                      outputId = "seqprepLogText",
                       placeholder = TRUE
                     )
                   )
@@ -274,7 +281,161 @@ ui <- page_navbar(
             ),
             nav_panel(
               title = "CUTADAPT",
-              p("Primer-trimming settings")
+              layout_columns(
+                col_widths = breakpoints(
+                  md = c(6, 6, 6, 6, 6, 6, 12)
+                ),
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "Minimum Retained Sequence Length",
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Minimum read length retained after primer and quality
+                      trimming. Increase for longer amplicons; decrease for
+                      short markers or degraded DNA."
+                    )
+                  ),
+                  card_body(
+                    div(
+                      class = "labelsBelow",
+                      numericInput(
+                        inputId = "minimumRetainedSequenceLength",
+                        label = "[Min: NA; Default: 150 bp; Max: NA]",
+                        value = 150,
+                        step = 1
+                      )
+                    )
+                  )
+                ),
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "End-quality Cutoffs",
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Quality thresholds for trimming the 5′ and 3′ read ends.
+                      Increase to remove low-quality tails; decrease to preserve
+                      more sequence when read quality is high."
+                    )
+                  ),
+                  card_body(
+                    div(
+                      class = "labelsBelow",
+                      numericInput(
+                        inputId = "endQualityCutoffs",
+                        label = "[Min: NA; Default: 20 each end; Max: NA]",
+                        value = 20,
+                        step = 1
+                      )
+                    )
+                  )
+                ),
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "Maximum Primer Error Rate",
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Maximum mismatch proportion allowed during primer
+                      matching.Increase when variation near primer sites
+                      is expected; decrease when false primer matches are
+                       a concern."
+                    )
+                  ),
+                  card_body(
+                    div(
+                      class = "labelsBelow",
+                      numericInput(
+                        inputId = "maximumPrimerErrorRate",
+                        label = "[Min: NA; Default: 0.1 (10%); Max: NA]",
+                        value = 0.1,
+                        step = 0.01
+                      )
+                    )
+                  )
+                ),
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "Minimum Primer Overlap",
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Minimum matching bases required to detect a primer.
+                       Increase to reduce accidental matches; decrease only
+                       for highly degraded reads or expected partial primers."
+                    )
+                  ),
+                  card_body(
+                    div(
+                      class = "labelsBelow",
+                      numericInput(
+                        inputId = "minimumPrimerOverlap",
+                        label = "[Min: NA; Default: 3 bases; Max: NA]",
+                        value = 3,
+                        step = 1
+                      )
+                    )
+                  )
+                ),
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "Maximum Ambiguous Bases",
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Maximum number of ambiguous bases (N) permitted in a
+                      read. Increase for lower-quality data; decrease for
+                      stricter quality filtering."
+                    )
+                  ),
+                  card_body(
+                    div(
+                      class = "labelsBelow",
+                      numericInput(
+                        inputId = "maximumAmbiguousBases",
+                        label = "[Min: NA; Default: 3; Max: NA]",
+                        value = 3,
+                        step = 1
+                      )
+                    )
+                  )
+                ),
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "Reverse-Complement Search",
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Searches for primers in the reverse-complement
+                      orientation as well. Enable when reads may occur
+                      in either orientation. [Default: No]"
+                    )
+                  ),
+                  card_body(
+                    div(
+                      class = "labelsBelow",
+                      checkboxInput(
+                        inputId = "reverseComplementSearch",
+                        label = "Reverse-Complement Search",
+                        value = FALSE
+                      )
+                    )
+                  )
+                ),
+                card(
+                  class = "cutadaptLog",
+                  card_header(
+                    h4("CUTADAPT Log")
+                  ),
+                  card_body(
+                    verbatimTextOutput(
+                      outputId = "cutadaptLogText",
+                      placeholder = TRUE
+                    )
+                  )
+                )
+              )
             ),
             nav_panel(
               title = "VSEARCH",

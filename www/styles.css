@@ -182,3 +182,14 @@
   font-weight: bold;
   text-align: center;
 }
+
+.labelsBelow .shiny-input-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.labelsBelow .shiny-input-container > label {
+  order: 1;
+  margin-top: 6px;
+  margin-bottom: 0;
+}
