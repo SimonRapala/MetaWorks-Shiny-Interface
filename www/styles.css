@@ -1,39 +1,44 @@
+/* Gives the main navbar its background and minimum height */
 .navbar{
   background-color: #0B0F19;
   min-height: 110px;
 }
 
+/* Changes the title shown in the main navbar */
 .navbar .navbar-brand{
   color: #FFFFFF;
   font-size: 22px;
 }
 
+/* Highlights the selected main navbar option */
 .navbar .navbar-nav .nav-item .nav-link.active{
-  color:#FFFFFF;
+  color: #FFFFFF;
   background-color: #1F2937;
   padding: 7px 11px !important;
-
   border: 1px solid #3B82F6;
   border-radius: 8%;
 }
 
+/* Gives the navbar options their normal appearance */
 .nav-item .nav-link{
   background-color: #0B0F19;
   color: #9CA3AF;
   font-size: 17px;
 }
 
-.navbar .navbar-nav {
+/* Adds spacing between the main navbar options */
+.navbar .navbar-nav{
   padding-right: 30px;
   column-gap: 86px;
   row-gap: 30px;
 }
 
-
+/* Adds space above the home title and description */
 .titleContainer{
   margin-top: 8px;
 }
 
+/* Centers the home title inside its column */
 #homeTitle{
   text-align: center;
   margin-top: auto;
@@ -41,13 +46,14 @@
   font-size: 46px;
 }
 
+/* Centers the description beside the title */
 #titleBlurb{
   margin-top: auto;
   margin-bottom: auto;
   text-align: center;
 }
 
-
+/* Centers the home cards and limits how wide the row can grow */
 .homeCardsContainer{
   margin: auto !important;
   max-width: 1200px;
@@ -55,19 +61,23 @@
   gap: 40px;
 }
 
+/* Adds the border around each home card */
 .homeCard{
   border: 1px solid #050097;
 }
 
+/* Stacks the description and button vertically */
 .homeCard .card-body{
   display: flex;
   flex-direction: column;
 }
 
+/* Pushes the button to the bottom of each home card */
 .homeCard .action-button{
   margin-top: auto;
 }
 
+/* Centers the upload cards and adds space between their rows */
 #uploadLayout{
   width: 85%;
   margin-top: 40px;
@@ -76,8 +86,8 @@
   row-gap: 50px;
 }
 
-
-#uploadLayout h3 {
+/* Gives both upload headings enough room for three lines */
+#uploadLayout h3{
   font-size: 18px;
   text-align: center;
   font-weight: bold;
@@ -85,6 +95,7 @@
   min-height: 3.9em;
 }
 
+/* Stacks the upload card content and keeps the cards tall enough */
 .createCard .card-body{
   min-height: 300px;
   row-gap: 14px !important;
@@ -92,33 +103,39 @@
   flex-direction: column;
 }
 
-
-
-.createCard .shiny-input-container {
+/* Centers the upload control and keeps it inside the card */
+.createCard .shiny-input-container{
   width: 200px;
   max-width: 100%;
   margin: auto;
 }
 
-.createCard .input-group input[type="text"] {
+/* Hides the filename box next to the upload button */
+.createCard .input-group input[type="text"]{
   display: none;
 }
 
-
+/* Allows the upload button to use the full input width */
 .createCard .input-group-btn,
-.createCard .btn-file {
+.createCard .btn-file{
   width: 100%;
 }
 
-
-.uploadLog h4{
+/* Gives the upload log and all settings logs the same heading style */
+.uploadLog h4,
+.seqprepLog h4,
+.cutadaptLog h4,
+.vsearchLog h4,
+.classificationLog h4,
+.pseudogeneLog h4,
+.outputLog h4{
   font-size: 18px;
   font-weight: bold;
   text-align: center;
 }
 
-/* Container */
-#settingsTabs {
+/* Keeps the settings tabs in one row with a shared background */
+#settingsTabs{
   display: flex;
   gap: 8px;
   padding: 8px;
@@ -129,14 +146,15 @@
   flex-wrap: nowrap;
 }
 
-/* Equal-width tabs, wrapping on smaller screens */
-#settingsTabs > .nav-item {
+/* Allows each tab to grow or shrink from the same starting width */
+#settingsTabs > .nav-item{
   flex: 1 1 150px;
+  min-width: 0;
   background: transparent;
 }
 
-/* Default tab */
-#settingsTabs .nav-link {
+/* Gives each settings tab its normal appearance */
+#settingsTabs .nav-link{
   width: 100%;
   padding: 12px 16px;
   border: none;
@@ -148,47 +166,50 @@
   text-align: center;
 }
 
-/* Hover */
-#settingsTabs .nav-link:hover {
+/* Changes the settings tab colour when hovered over */
+#settingsTabs .nav-link:hover{
   background: #E5E7EB;
   color: #111827;
 }
 
-/* Selected tab */
-#settingsTabs .nav-link.active {
+/* Highlights the selected settings tab */
+#settingsTabs .nav-link.active{
   background: #1F2937;
   color: #FFFFFF;
 }
 
-/* Keyboard focus */
-#settingsTabs .nav-link:focus-visible {
+/* Shows which settings tab is focused when using the keyboard */
+#settingsTabs .nav-link:focus-visible{
   outline: 2px solid #2563EB;
   outline-offset: 2px;
 }
 
+/* Places the setting title and question mark at opposite sides */
 .settingsHeader{
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 12px;
 }
 
-.settingsHeader .toolTip {
+/* Changes the question mark appearance and shows the help cursor */
+.settingsHeader .toolTip{
   color: #050097;
   font-size: 24px;
   cursor: help;
+  flex-shrink: 0;
 }
 
-.seqprepLog h4{
-  font-size: 18px;
-  font-weight: bold;
-  text-align: center;
-}
-
-.labelsBelow .shiny-input-container {
+/* Makes each input wrapper stack its children vertically */
+.labelsBelow .shiny-input-container{
   display: flex;
   flex-direction: column;
+  max-width: 100%;
 }
 
-.labelsBelow .shiny-input-container > label {
+/* Moves a direct label after the input, whose default order is zero */
+/* Checkbox labels are nested differently and keep their normal position */
+.labelsBelow .shiny-input-container > label{
   order: 1;
   margin-top: 6px;
   margin-bottom: 0;

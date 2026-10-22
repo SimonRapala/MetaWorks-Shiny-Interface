@@ -155,18 +155,23 @@ ui <- page_navbar(
         nav_panel_hidden(
           value = "settings",
           h2("Settings"),
+          # Creates the tabs used to group the settings by processing step
           navset_pill(
             id = "settingsTabs",
+            # Settings used when merging the forward and reverse reads
             nav_panel(
               title = "SEQPREP",
               layout_columns(
                 col_widths = breakpoints(
                   md = c(6, 6, 6, 6, 12)
                 ),
+                # Each card holds a title, a tooltip and the setting input
                 card(
                   card_header(
+                    # Allows CSS to space the title and question mark apart
                     class = "settingsHeader",
                     "Phred Quality Cutoff",
+                    # Displays the explanation when hovering over the icon
                     tooltip(
                       icon("circle-question", class = "toolTip"),
                       "Minimum base quality accepted during
@@ -177,6 +182,7 @@ ui <- page_navbar(
                   ),
                   card_body(
                     div(
+                      # CSS places the range and default label below the input
                       class = "labelsBelow",
                       numericInput(
                         inputId = "phredQualityCutoff",
@@ -279,6 +285,7 @@ ui <- page_navbar(
                 )
               )
             ),
+            # Settings used when trimming primers and low-quality sequence
             nav_panel(
               title = "CUTADAPT",
               layout_columns(
@@ -324,7 +331,14 @@ ui <- page_navbar(
                       class = "labelsBelow",
                       numericInput(
                         inputId = "endQualityCutoffs",
-                        label = "[Min: NA; Default: 20 each end; Max: NA]",
+                        label = "5′ end [Min: NA; Default: 20; Max: NA]",
+                        value = 20,
+                        step = 1
+                      ),
+                      # Separate input allows each read end to have its own cutoff
+                      numericInput(
+                        inputId = "endQualityCutoff3Prime",
+                        label = "3′ end [Min: NA; Default: 20; Max: NA]",
                         value = 20,
                         step = 1
                       )
@@ -437,17 +451,675 @@ ui <- page_navbar(
                 )
               )
             ),
+            # Settings for VSEARCH
             nav_panel(
               title = "VSEARCH",
-              p("Denoising settings")
+              layout_columns(
+                # Gives each setting half the row and the log the full row
+                col_widths = breakpoints(
+                  md = c(6, 6, 12)
+                ),
+                # Sets the minimum number of reads needed to keep a variant
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "Minimum Reads per Cluster",
+                    # Shows a short explanation when the question mark is hovered over
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Minimum reads supporting a sequence variant during denoising.
+                      Increase to remove more low-abundance noise; decrease for low-
+                      depth samples or when rare taxa are important."
+                    )
+                  ),
+                  card_body(
+                    div(
+                      # Allows the input label to be moved below the box with CSS
+                      class = "labelsBelow",
+                      numericInput(
+                        inputId = "minimumReadsPerCluster",
+                        label = "[Min: NA; Default: 8; Max: NA]",
+                        value = 8,
+                        step = 1
+                      )
+                    )
+                  )
+                ),
+                # Sets how many CPU threads VSEARCH can use
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "VSEARCH Thread Count",
+                    # Shows a short explanation when the question mark is hovered over
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Number of CPU threads used during processing. Increase when more
+                      CPU resources are available; decrease on smaller or shared
+                      computers."
+                    )
+                  ),
+                  card_body(
+                    div(
+                      # Allows the input label to be moved below the box with CSS
+                      class = "labelsBelow",
+                      numericInput(
+                        inputId = "vsearchThreadCount",
+                        label = "[Min: NA; Default: 15; Max: NA]",
+                        value = 15,
+                        step = 1
+                      )
+                    )
+                  )
+                ),
+                # Holds the messages returned by settings validation later
+                card(
+                  class = "vsearchLog",
+                  card_header(
+                    h4("VSEARCH Log")
+                  ),
+                  card_body(
+                    verbatimTextOutput(
+                      outputId = "vsearchLogText",
+                      placeholder = TRUE
+                    )
+                  )
+                )
+              )
             ),
+            # Settings for Classification
             nav_panel(
               title = "Classification",
-              p("Marker and RDP settings")
+              layout_columns(
+                # Gives each setting half the row and the log the full row
+                # Empty columns center the final setting when there is an odd number
+                col_widths = breakpoints(
+                  md = c(6, 6, 6, 6, -3, 6, -3, 12)
+                ),
+                # Allows selection of the marker used for the run
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "Genetic Marker and Classifier",
+                    # Shows a short explanation when the question mark is hovered over
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Marker being analyzed and the reference classifier used for
+                      taxonomy. Choose the marker that matches your uploaded reads and
+                      primers."
+                    )
+                  ),
+                  card_body(
+                    div(
+                      # Allows the input label to be moved below the box with CSS
+                      class = "labelsBelow",
+                      selectizeInput(
+                        inputId = "geneticMarker",
+                        label = "[Default: COI]",
+                        choices = c(
+                          "16S",
+                          "16S_vertebrate",
+                          "18S_eukaryota",
+                          "18S_diatom",
+                          "12S_fish",
+                          "12S_vertebrate",
+                          "ITS_fungi",
+                          "28S_fungi",
+                          "rbcL_eukaryota",
+                          "rbcL_diatom",
+                          "rbcL_landPlant",
+                          "ITS_plants",
+                          "COI"
+                        ),
+                        selected = "COI",
+                        # Allows the options to extend outside the card
+                        options = list(
+                          dropdownParent = "body"
+                        )
+                      )
+                    )
+                  )
+                ),
+                # Selects the region used when processing ITS reads
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "ITS Region",
+                    # Shows a short explanation when the question mark is hovered over
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "ITS region being processed. Choose ITS1 or ITS2 to match your
+                      primers. Only applies to ITS datasets."
+                    )
+                  ),
+                  card_body(
+                    div(
+                      # Allows the input label to be moved below the box with CSS
+                      class = "labelsBelow",
+                      selectizeInput(
+                        inputId = "itsRegion",
+                        label = "[Default: ITS2]",
+                        choices = c(
+                          "ITS1",
+                          "ITS2"
+                        ),
+                        selected = "ITS2",
+                        # Allows the options to extend outside the card
+                        options = list(
+                          dropdownParent = "body"
+                        )
+                      )
+                    )
+                  )
+                ),
+                # Sets the memory amount that will later be written as -Xmx8g
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "RDP Memory Allocation",
+                    # Shows a short explanation when the question mark is hovered over
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Maximum RAM allocated to the classifier. Increase for large
+                      datasets or memory errors; decrease when the computer has less
+                      available RAM."
+                    )
+                  ),
+                  card_body(
+                    div(
+                      # Allows the input label to be moved below the box with CSS
+                      class = "labelsBelow",
+                      numericInput(
+                        inputId = "rdpMemoryAllocation",
+                        label = "[Min: NA; Default: 8 GB; Max: NA]",
+                        value = 8,
+                        step = 1
+                      )
+                    )
+                  )
+                ),
+                # Allows the run to use a custom-trained classifier
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "Custom-trained Classifier",
+                    # Shows a short explanation when the question mark is hovered over
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Uses a custom-trained taxonomic classifier. Leave enabled when the
+                      selected workflow needs one; disable when using a compatible
+                      built-in classifier. [Default: Yes]"
+                    )
+                  ),
+                  card_body(
+                    div(
+                      # Allows the input label to be moved below the box with CSS
+                      class = "labelsBelow",
+                      checkboxInput(
+                        inputId = "customTrainedClassifier",
+                        label = "Use Custom-trained Classifier",
+                        value = TRUE
+                      )
+                    )
+                  )
+                ),
+                # Selects the built-in reference used for fungal classification
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "Built-in Fungal Classifier",
+                    # Shows a short explanation when the question mark is hovered over
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Built-in reference classifier for fungal taxonomy. Select the
+                      reference matching your fungal marker. Applies to fungal datasets
+                      using a built-in classifier."
+                    )
+                  ),
+                  card_body(
+                    div(
+                      # Allows the input label to be moved below the box with CSS
+                      class = "labelsBelow",
+                      selectizeInput(
+                        inputId = "builtInFungalClassifier",
+                        label = "[Default: fungallsu]",
+                        choices = c(
+                          "fungallsu",
+                          "fungalits_unite",
+                          "fungalits_warcup"
+                        ),
+                        selected = "fungallsu",
+                        # Allows the options to extend outside the card
+                        options = list(
+                          dropdownParent = "body"
+                        )
+                      )
+                    )
+                  )
+                ),
+                # Holds the messages returned by settings validation later
+                card(
+                  class = "classificationLog",
+                  card_header(
+                    h4("Classification Log")
+                  ),
+                  card_body(
+                    verbatimTextOutput(
+                      outputId = "classificationLogText",
+                      placeholder = TRUE
+                    )
+                  )
+                )
+              )
             ),
+            # Settings for Pseudogene filtering
             nav_panel(
               title = "Pseudogene filtering",
-              p("Pseudogene and ORFfinder settings")
+              layout_columns(
+                # Gives each setting half the row and the log the full row
+                # Empty columns center the final setting when there is an odd number
+                col_widths = breakpoints(
+                  md = c(6, 6, 6, 6, 6, 6, 6, 6, 6, 6, -3, 6, -3, 12)
+                ),
+                # Controls whether pseudogene filtering is used
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "Enable Pseudogene Filtering",
+                    # Shows a short explanation when the question mark is hovered over
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Removes likely non-functional copies of protein-coding genes.
+                      Disable when filtering is not relevant or when examining
+                      unfiltered sequences. Mainly intended for protein-coding markers
+                      such as COI. [Default: Yes]"
+                    )
+                  ),
+                  card_body(
+                    div(
+                      # Allows the input label to be moved below the box with CSS
+                      class = "labelsBelow",
+                      checkboxInput(
+                        inputId = "enablePseudogeneFiltering",
+                        label = "Enable Pseudogene Filtering",
+                        value = TRUE
+                      )
+                    )
+                  )
+                ),
+                # Stores the option value while displaying a readable name
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "Taxonomic Filtering Type",
+                    # Shows a short explanation when the question mark is hovered over
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Selects sequences for screening using one taxonomic rule or
+                      compound include/exclude rules. Choose compound filtering when a
+                      second taxonomic rule is needed."
+                    )
+                  ),
+                  card_body(
+                    div(
+                      # Allows the input label to be moved below the box with CSS
+                      class = "labelsBelow",
+                      selectizeInput(
+                        inputId = "taxonomicFilteringType",
+                        label = "[Default: Simple]",
+                        choices = c(
+                          "Simple" = "1",
+                          "Compound" = "2"
+                        ),
+                        selected = "1",
+                        # Allows the options to extend outside the card
+                        options = list(
+                          dropdownParent = "body"
+                        )
+                      )
+                    )
+                  )
+                ),
+                # Holds the primary taxonomic rule used by the configuration
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "Primary Taxonomic Filter",
+                    # Shows a short explanation when the question mark is hovered over
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Taxonomic group selected for pseudogene screening. Change
+                      Arthropoda when targeting a different group; use the whole-rank
+                      taxonomic name."
+                    )
+                  ),
+                  card_body(
+                    div(
+                      # Allows the input label to be moved below the box with CSS
+                      class = "labelsBelow",
+                      textInput(
+                        inputId = "primaryTaxonomicFilter",
+                        label = "[Default: -e Arthropoda]",
+                        value = "-e Arthropoda"
+                      )
+                    )
+                  )
+                ),
+                # Holds the extra rule used when compound filtering is selected
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "Secondary Taxonomic Filter",
+                    # Shows a short explanation when the question mark is hovered over
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Additional taxonomic rule used only with compound filtering.
+                      Change this to include or exclude the second group required by
+                      your analysis."
+                    )
+                  ),
+                  card_body(
+                    div(
+                      # Allows the input label to be moved below the box with CSS
+                      class = "labelsBelow",
+                      textInput(
+                        inputId = "secondaryTaxonomicFilter",
+                        label = "[Default: -v Chordata; Compound filtering only]",
+                        value = "-v Chordata"
+                      )
+                    )
+                  )
+                ),
+                # Selects the method used to identify suspected pseudogenes
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "Pseudogene-removal Method",
+                    # Shows a short explanation when the question mark is hovered over
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Identifies suspected pseudogenes by unusual ORF length or
+                      comparison with an HMM profile. Choose HMM only when a suitable
+                      validated reference profile is available."
+                    )
+                  ),
+                  card_body(
+                    div(
+                      # Allows the input label to be moved below the box with CSS
+                      class = "labelsBelow",
+                      selectizeInput(
+                        inputId = "pseudogeneRemovalMethod",
+                        label = "[Default: ORF Length]",
+                        choices = c(
+                          "ORF Length" = "1",
+                          "HMM Profile" = "2"
+                        ),
+                        selected = "1",
+                        # Allows the options to extend outside the card
+                        options = list(
+                          dropdownParent = "body"
+                        )
+                      )
+                    )
+                  )
+                ),
+                # Lists the known template profile; add other installed profiles here
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "HMM Profile",
+                    # Shows a short explanation when the question mark is hovered over
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Reference profile for HMM-based filtering. The template uses
+                      bold.hmm for COI arthropods. Change only when another validated
+                      profile is available. Only used with the HMM method."
+                    )
+                  ),
+                  card_body(
+                    div(
+                      # Allows the input label to be moved below the box with CSS
+                      class = "labelsBelow",
+                      selectizeInput(
+                        inputId = "hmmProfile",
+                        label = "[Default: bold.hmm; HMM method only]",
+                        choices = c(
+                          "bold.hmm"
+                        ),
+                        selected = "bold.hmm",
+                        # Allows the options to extend outside the card
+                        options = list(
+                          dropdownParent = "body"
+                        )
+                      )
+                    )
+                  )
+                ),
+                # Offers the three genetic codes listed in the worksheet
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "Genetic Code",
+                    # Shows a short explanation when the question mark is hovered over
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Translation table used to identify open reading frames. Change to
+                      the genetic code used by your target organisms, such as vertebrate
+                      mitochondrial code for vertebrate mitochondria."
+                    )
+                  ),
+                  card_body(
+                    div(
+                      # Allows the input label to be moved below the box with CSS
+                      class = "labelsBelow",
+                      selectizeInput(
+                        inputId = "geneticCode",
+                        label = "[Default: Invertebrate Mitochondrial (5)]",
+                        choices = c(
+                          "Standard (1)" = "1",
+                          "Vertebrate Mitochondrial (2)" = "2",
+                          "Invertebrate Mitochondrial (5)" = "5"
+                        ),
+                        selected = "5",
+                        # Allows the options to extend outside the card
+                        options = list(
+                          dropdownParent = "body"
+                        )
+                      )
+                    )
+                  )
+                ),
+                # Selects how ORFfinder identifies the beginning of an ORF
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "Start-codon Behaviour",
+                    # Shows a short explanation when the question mark is hovered over
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Codons allowed at the start of an open reading frame. Use a
+                      stricter option only when biological start codons are required;
+                      any sense codon accommodates partial barcode sequences."
+                    )
+                  ),
+                  card_body(
+                    div(
+                      # Allows the input label to be moved below the box with CSS
+                      class = "labelsBelow",
+                      selectizeInput(
+                        inputId = "startCodonBehaviour",
+                        label = "[Min: 0; Default: 2; Max: 2]",
+                        choices = c(
+                          "ATG Only (0)" = "0",
+                          "ATG and Alternatives (1)" = "1",
+                          "Any Sense Codon (2)" = "2"
+                        ),
+                        selected = "2",
+                        # Allows the options to extend outside the card
+                        options = list(
+                          dropdownParent = "body"
+                        )
+                      )
+                    )
+                  )
+                ),
+                # Uses the worksheet suggested range for ORF length
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "Minimum ORF Length",
+                    # Shows a short explanation when the question mark is hovered over
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Shortest open reading frame reported, in nucleotides. Increase for
+                      longer target regions; use a smaller allowed value for short
+                      targets."
+                    )
+                  ),
+                  card_body(
+                    div(
+                      # Allows the input label to be moved below the box with CSS
+                      class = "labelsBelow",
+                      numericInput(
+                        inputId = "minimumOrfLength",
+                        label = "[Min: 30 nt; Default: 30 nt; Max: 1000 nt]",
+                        value = 30,
+                        min = 30,
+                        max = 1000,
+                        step = 1
+                      )
+                    )
+                  )
+                ),
+                # Controls whether nested ORFs are ignored
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "Ignore Nested ORFs",
+                    # Shows a short explanation when the question mark is hovered over
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Ignores open reading frames entirely contained within larger ones.
+                      Disable only when nested ORF structure is needed for a specialized
+                      analysis. [Default: Yes]"
+                    )
+                  ),
+                  card_body(
+                    div(
+                      # Allows the input label to be moved below the box with CSS
+                      class = "labelsBelow",
+                      checkboxInput(
+                        inputId = "ignoreNestedOrfs",
+                        label = "Ignore Nested ORFs",
+                        value = TRUE
+                      )
+                    )
+                  )
+                ),
+                # Selects which strand ORFfinder searches
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "ORF Strand",
+                    # Shows a short explanation when the question mark is hovered over
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "DNA strand searched for open reading frames. Choose both when
+                      orientation is unknown, or minus when the expected sequence is on
+                      the reverse strand."
+                    )
+                  ),
+                  card_body(
+                    div(
+                      # Allows the input label to be moved below the box with CSS
+                      class = "labelsBelow",
+                      selectizeInput(
+                        inputId = "orfStrand",
+                        label = "[Default: Plus]",
+                        choices = c(
+                          "Plus" = "plus",
+                          "Minus" = "minus",
+                          "Both" = "both"
+                        ),
+                        selected = "plus",
+                        # Allows the options to extend outside the card
+                        options = list(
+                          dropdownParent = "body"
+                        )
+                      )
+                    )
+                  )
+                ),
+                # Holds the messages returned by settings validation later
+                card(
+                  class = "pseudogeneLog",
+                  card_header(
+                    h4("Pseudogene filtering Log")
+                  ),
+                  card_body(
+                    verbatimTextOutput(
+                      outputId = "pseudogeneLogText",
+                      placeholder = TRUE
+                    )
+                  )
+                )
+              )
+            ),
+            # Settings for Output
+            nav_panel(
+              title = "Output",
+              layout_columns(
+                # Gives each setting half the row and the log the full row
+                # Empty columns center the final setting when there is an odd number
+                col_widths = breakpoints(
+                  md = c(-3, 6, -3, 12)
+                ),
+                # Selects how the final output files will be organized
+                card(
+                  card_header(
+                    class = "settingsHeader",
+                    "Report Type",
+                    # Shows a short explanation when the question mark is hovered over
+                    tooltip(
+                      icon("circle-question", class = "toolTip"),
+                      "Controls how final results are saved. Choose combined results for
+                      one results.csv file; choose separate files for downstream scripts
+                      or troubleshooting."
+                    )
+                  ),
+                  card_body(
+                    div(
+                      # Allows the input label to be moved below the box with CSS
+                      class = "labelsBelow",
+                      selectizeInput(
+                        inputId = "reportType",
+                        label = "[Default: Combined Results]",
+                        choices = c(
+                          "Combined Results" = "1",
+                          "Separate Files" = "2"
+                        ),
+                        selected = "1",
+                        # Allows the options to extend outside the card
+                        options = list(
+                          dropdownParent = "body"
+                        )
+                      )
+                    )
+                  )
+                ),
+                # Holds the messages returned by settings validation later
+                card(
+                  class = "outputLog",
+                  card_header(
+                    h4("Output Log")
+                  ),
+                  card_body(
+                    verbatimTextOutput(
+                      outputId = "outputLogText",
+                      placeholder = TRUE
+                    )
+                  )
+                )
+              )
             )
           )
         ),
@@ -626,6 +1298,10 @@ server <- function(input, output, session) {
     nav_select("mainNavbar", selected = "help")
   })
 
+
+  # Settings log outputs will be connected here when validation is added
+  # Input values are available through input$ followed by their inputId
+  # Dropdown values are strings and checkboxes return TRUE or FALSE
 
   # The checks and validation for the file uploads in Create
   output$uploadLogText <- renderText({
