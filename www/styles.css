@@ -214,3 +214,7 @@
   margin-top: 6px;
   margin-bottom: 0;
 }
+
+.modal-header{
+  justify-content: space-between;
+}

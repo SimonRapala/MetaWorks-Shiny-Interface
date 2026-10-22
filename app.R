@@ -1,6 +1,7 @@
 # Loading in the libraries used
 library(shiny)
 library(bslib)
+library(shinyFiles)
 # Allows the use of external R files
 source("R/fileValidation.R")
 
@@ -21,10 +22,14 @@ ui <- page_navbar(
     base_font = "Arial"
   ),
   # Imports the stylesheet allowing changing of the CSS
-  header = tags$head(
-    tags$link(
-      rel = "stylesheet",
-      href = "styles.css"
+  header = tagList(
+    # Allows inputs to be enabled and disabled from the server
+    shinyjs::useShinyjs(),
+    tags$head(
+      tags$link(
+        rel = "stylesheet",
+        href = "styles.css"
+      )
     )
   ),
   # Panels allow user to click and select the navbar options
@@ -122,10 +127,10 @@ ui <- page_navbar(
                   "Select the raw sequence reads you would like to process",
                   br(), "(FASTQ format)"
                 ),
-                fileInput(
-                  inputId = "fastqUploadButton",
-                  multiple = TRUE, label = "",
-                  accept = "fastq.gz"
+                shinyFilesButton(
+                  id = "fastqUploadButton",
+                  multiple = TRUE, label = "Browse",
+                  title = "Select Read Fiels"
                 )
               )
             ),
@@ -133,10 +138,10 @@ ui <- page_navbar(
               class = "fastaUploadCard createCard",
               card_body(
                 h3("Select the adapter FASTA file"),
-                fileInput(
-                  inputId = "fastaUploadButton",
-                  multiple = FALSE, label = "",
-                  accept = ".fasta"
+                shinyFilesButton(
+                  id = "fastaUploadButton",
+                  multiple = FALSE, label = "Browse",
+                  title = "Select Adapter File"
                 )
               )
             ),
@@ -531,7 +536,6 @@ ui <- page_navbar(
               title = "Classification",
               layout_columns(
                 # Gives each setting half the row and the log the full row
-                # Empty columns center the final setting when there is an odd number
                 col_widths = breakpoints(
                   md = c(6, 6, 6, 6, -3, 6, -3, 12)
                 ),
@@ -539,12 +543,11 @@ ui <- page_navbar(
                 card(
                   card_header(
                     class = "settingsHeader",
-                    "Genetic Marker and Classifier",
+                    "Genetic Marker",
                     # Shows a short explanation when the question mark is hovered over
                     tooltip(
                       icon("circle-question", class = "toolTip"),
-                      "Marker being analyzed and the reference classifier used for
-                      taxonomy. Choose the marker that matches your uploaded reads and
+                      "Marker being analyzed. Choose the marker that matches your uploaded reads and
                       primers."
                     )
                   ),
@@ -556,19 +559,19 @@ ui <- page_navbar(
                         inputId = "geneticMarker",
                         label = "[Default: COI]",
                         choices = c(
-                          "16S",
-                          "16S_vertebrate",
-                          "18S_eukaryota",
-                          "18S_diatom",
-                          "12S_fish",
-                          "12S_vertebrate",
-                          "ITS_fungi",
-                          "28S_fungi",
-                          "rbcL_eukaryota",
-                          "rbcL_diatom",
-                          "rbcL_landPlant",
-                          "ITS_plants",
-                          "COI"
+                          "16S (built-in available)" = "16S",
+                          "16S_vertebrate (external classifier required)" = "16S_vertebrate",
+                          "18S_eukaryota (external classifier required)" = "18S_eukaryota",
+                          "18S_diatom (external classifier required)" = "18S_diatom",
+                          "12S_fish (external classifier required)" = "12S_fish",
+                          "12S_vertebrate (external classifier required)" = "12S_vertebrate",
+                          "ITS_fungi (built-in available)" = "ITS_fungi",
+                          "28S_fungi (built-in available)" = "28S_fungi",
+                          "rbcL_eukaryota (external classifier required)" = "rbcL_eukaryota",
+                          "rbcL_diatom (external classifier required)" = "rbcL_diatom",
+                          "rbcL_landPlant (external classifier required)" = "rbcL_landPlant",
+                          "ITS_plants (external classifier required)" = "ITS_plants",
+                          "COI (classifier included)" = "COI"
                         ),
                         selected = "COI",
                         # Allows the options to extend outside the card
@@ -637,23 +640,48 @@ ui <- page_navbar(
                     )
                   )
                 ),
-                # Allows the run to use a custom-trained classifier
+                # Displays the classifier source choices for the new layout
                 card(
                   card_header(
                     class = "settingsHeader",
-                    "Custom-trained Classifier",
-                    # Shows a short explanation when the question mark is hovered over
+                    "Classifier Source",
                     tooltip(
                       icon("circle-question", class = "toolTip"),
-                      "Uses a custom-trained taxonomic classifier. Leave enabled when the
-                      selected workflow needs one; disable when using a compatible
-                      built-in classifier. [Default: Yes]"
+                      "Choose the included COI classifier, an RDP built-in model,
+                      or an external trained classifier."
                     )
                   ),
                   card_body(
+                    # The new source selection will be connected to the server later
+                    radioButtons(
+                      inputId = "classifierSource",
+                      label = NULL,
+                      choices = c(
+                        "Included COI classifier" = "included",
+                        "RDP built-in classifier" = "builtin",
+                        "External trained classifier" = "external"
+                      ),
+                      selected = "included"
+                    ),
+                    # Selects between the two built-in fungal ITS references
+                    # Its visibility and enabled state will be connected later
+                    selectizeInput(
+                      inputId = "builtInFungalClassifier",
+                      label = "Built-in fungal ITS reference",
+                      choices = c(
+                        "Choose a reference" = "",
+                        "Warcup" = "fungalits_warcup",
+                        "UNITE (2014)" = "fungalits_unite"
+                      ),
+                      selected = "",
+                      options = list(
+                        dropdownParent = "body"
+                      )
+                    ),
+                    helpText("Applies to fungal ITS when using an RDP built-in classifier."),
+                    # Keeps the existing server input available during the display preview
                     div(
-                      # Allows the input label to be moved below the box with CSS
-                      class = "labelsBelow",
+                      style = "display: none;",
                       checkboxInput(
                         inputId = "customTrainedClassifier",
                         label = "Use Custom-trained Classifier",
@@ -662,36 +690,37 @@ ui <- page_navbar(
                     )
                   )
                 ),
-                # Selects the built-in reference used for fungal classification
+                # Allows selection of an external classifier
                 card(
                   card_header(
                     class = "settingsHeader",
-                    "Built-in Fungal Classifier",
+                    "External Classifier",
                     # Shows a short explanation when the question mark is hovered over
                     tooltip(
                       icon("circle-question", class = "toolTip"),
-                      "Built-in reference classifier for fungal taxonomy. Select the
-                      reference matching your fungal marker. Applies to fungal datasets
-                      using a built-in classifier."
+                      "Browse to the properties file for an external trained classifier.
+                      Keep its companion training files in the same folder."
                     )
                   ),
                   card_body(
                     div(
                       # Allows the input label to be moved below the box with CSS
                       class = "labelsBelow",
-                      selectizeInput(
-                        inputId = "builtInFungalClassifier",
-                        label = "[Default: fungallsu]",
-                        choices = c(
-                          "fungallsu",
-                          "fungalits_unite",
-                          "fungalits_warcup"
-                        ),
-                        selected = "fungallsu",
-                        # Allows the options to extend outside the card
-                        options = list(
-                          dropdownParent = "body"
-                        )
+                      # Allows selection of a different classifier properties file
+                      shinyFilesButton(
+                        id = "classifierBrowse",
+                        label = "Browse",
+                        title = "Select the classifier properties file",
+                        multiple = FALSE
+                      ),
+
+                      # Displays the classifier currently selected
+                      textOutput("classifierPathText"),
+
+                      # Retains the old reset input until the source behaviour is updated
+                      div(
+                        style = "display: none;",
+                        actionButton("resetClassifier", "Use default COI")
                       )
                     )
                   )
@@ -1302,23 +1331,173 @@ server <- function(input, output, session) {
   # Settings log outputs will be connected here when validation is added
   # Input values are available through input$ followed by their inputId
   # Dropdown values are strings and checkboxes return TRUE or FALSE
+  # Enables settings only when they apply to the selected marker
 
-  # The checks and validation for the file uploads in Create
-  output$uploadLogText <- renderText({
-    filenames <- c(
-      input$fastqUploadButton$name,
-      input$fastaUploadButton$name
-    )
-    req(length(filenames) > 0)
-    validate(
-      need(
-        anyDuplicated(filenames) == 0,
-        "Duplicate file names are not permitted"
+
+  observe({
+    # ITS region only applies to fungal or plant ITS markers
+    shinyjs::toggleState(
+      id = "itsRegion",
+      condition = input$geneticMarker %in% c(
+        "ITS_fungi",
+        "ITS_plants"
       )
     )
 
-    result <- checkFastQFiles(filenames)
-    paste(result$outputLog, collapse = "\n")
+    # Built-in fungal options only apply when custom is unchecked
+    shinyjs::toggleState(
+      id = "builtInFungalClassifier",
+      condition = (
+        input$geneticMarker %in% c("ITS_fungi") &&
+          identical(input$classifierSource, "builtin")
+      )
+    )
+  })
+
+  # Changes the available classifier sources when the marker changes
+  observeEvent(input$geneticMarker, {
+    if (identical(input$geneticMarker, "COI")) {
+      updateRadioButtons(
+        session,
+        inputId = "classifierSource",
+        choices = c(
+          "Included COI classifier" = "included",
+          "External trained classifier" = "external"
+        ),
+        selected = "included"
+      )
+    } else if (input$geneticMarker %in% c(
+      "16S", "ITS_fungi", "28S_fungi"
+    )) {
+      updateRadioButtons(
+        session,
+        inputId = "classifierSource",
+        choices = c(
+          "RDP built-in classifier" = "builtin",
+          "External trained classifier" = "external"
+        ),
+        selected = "builtin"
+      )
+    } else {
+      updateRadioButtons(
+        session,
+        inputId = "classifierSource",
+        choices = c(
+          "External trained classifier" = "external"
+        ),
+        selected = "external"
+      )
+    }
+  })
+
+
+  # The folders that the user is allowed to browse
+  classifierRoots <- c(
+    Classifiers = "/home/simonr/MetaWorks/Classifiers"
+  )
+
+  # The default classifier used when the app starts
+  defaultClassifier <- paste0(
+    classifierRoots[["Classifiers"]],
+    "/COI/rRNAClassifier.properties"
+  )
+
+  # Stores the selected classifier for this user's session
+  classifierPath <- reactiveVal(defaultClassifier)
+
+  # Clears a browsed classifier when the genetic marker changes
+  observeEvent(input$geneticMarker, {
+    classifierPath(defaultClassifier)
+  }, ignoreInit = TRUE)
+
+  # Connects the browse button to the classifier folder
+  shinyFileChoose(
+    input,
+    id = "classifierBrowse",
+    roots = classifierRoots,
+    session = session,
+    filetypes = c("properties"),
+    defaultRoot = "Classifiers",
+    defaultPath = "COI"
+  )
+
+  # Updates the saved path when a file is selected
+  observeEvent(input$classifierBrowse, {
+    # The button can have an initial value before a file is selected
+    req(is.list(input$classifierBrowse))
+
+    selectedFile <- parseFilePaths(
+      classifierRoots,
+      input$classifierBrowse
+    )
+
+    req(nrow(selectedFile) == 1)
+
+    classifierPath(as.character(selectedFile$datapath[1]))
+  })
+
+  # Returns the selection to the default COI classifier
+  observeEvent(input$resetClassifier, {
+    classifierPath(defaultClassifier)
+  })
+
+  # Shows the current path below the browse button
+  output$classifierPathText <- renderText({
+    # The included COI path is not an external selection
+    if (identical(classifierPath(), defaultClassifier)) {
+      return("")
+    }
+
+    classifierPath()
+  })
+
+
+  # The checks and validation for the file uploads in Create
+  metaworksRoot <- c(
+    MetaWorks = "/home/simonr/MetaWorks"
+  )
+  shinyFileChoose(
+    input,
+    id = "fastqUploadButton",
+    roots = metaworksRoot,
+    session = session,
+    filetypes = c("gz"),
+    defaultRoot = "MetaWorks"
+  )
+
+  shinyFileChoose(
+    input,
+    id = "fastaUploadButton",
+    roots = metaworksRoot,
+    session = session,
+    filetypes = c("fasta"),
+    defaultRoot = "MetaWorks"
+  )
+  output$uploadLogText <- renderText({
+    fastqFiles <- if (is.list(input$fastqUploadButton)) {
+    parseFilePaths(metaworksRoot, input$fastqUploadButton)
+  } else {
+    data.frame(name = character(0), datapath = character(0))
+  }
+
+  adapterFiles <- if (is.list(input$fastaUploadButton)) {
+    parseFilePaths(metaworksRoot, input$fastaUploadButton)
+  } else {
+    data.frame(name = character(0), datapath = character(0))
+  }
+
+  filenames <- c(fastqFiles$name, adapterFiles$name)
+
+  req(length(filenames) > 0)
+  validate(
+    need(
+      anyDuplicated(filenames) == 0,
+      "No Duplicate File Names Allowed"
+    )
+  )
+
+  result <- checkFastQFiles(filenames)
+  paste(result$outputLog, collapse = "\n")
   })
 }
 
