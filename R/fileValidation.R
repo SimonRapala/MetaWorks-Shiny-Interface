@@ -3,6 +3,7 @@ checkFastQFiles <- function(filenames) {
   adapterFilePresent <- FALSE
   fastqFilesMissing <- FALSE
   log <- character(0)
+  logStatus <- character(0)
   adapterFile <- character(0)
 
   #Logical vector with locations of FASTQ files
@@ -13,6 +14,7 @@ checkFastQFiles <- function(filenames) {
   if (length(fastqFiles) == 0) {
     fastqFilesMissing <- TRUE
     log <- c(log, "No FASTQ files supplied")
+    logStatus <- c(logStatus, "ERROR")
   }
 
   #Logical vector with location of FASTA file
@@ -25,9 +27,11 @@ checkFastQFiles <- function(filenames) {
     adapterFilePresent <- TRUE
     #Tracks the name and adds it to the log
     log <- c(log, paste0("Fasta file ", adapterFile, " is present"))
+    logStatus <- c(logStatus, "SUCCESS")
   } else {
     #Tracks in the log if it is missing
     log <- c(log, "Missing fasta file")
+    logStatus <- c(logStatus, "ERROR")
   }
 
   # Gets all R1 and R2 boolean reads respectively
@@ -38,6 +42,7 @@ checkFastQFiles <- function(filenames) {
   if (any(!(fwdReadBool | revReadBool))) {
     fastqFilesMissing <- TRUE
     log <- c(log, "Some FASTQ filenames lack an _R1_ or _R2_ identifier")
+    logStatus <- c(logStatus, "ERROR")
   }
   #Extracts the actual R1 and R2 reads
   fwdRead <- fastqFiles[fwdReadBool]
@@ -64,6 +69,7 @@ checkFastQFiles <- function(filenames) {
     #Goes through each read that is missing a pairing and add it to the log
     for (pair in missingPairs) {
       log <- c(log, paste0("Missing file: ", pair))
+      logStatus <- c(logStatus, "ERROR")
     }
   }
   #Combines the existing reads that have pairs
@@ -76,6 +82,7 @@ checkFastQFiles <- function(filenames) {
       log,
       paste0(fwdRead[i], " is paired with ", expectedRevRead[i])
     )
+    logStatus <- c(logStatus, "SUCCESS")
   }
 }
   #Returns a list that has the paired files,
@@ -85,6 +92,7 @@ checkFastQFiles <- function(filenames) {
     fastqPairs = combinedPairs,
     adapterFile = adapterFile,
     outputLog = log,
+    outputLogStatus = logStatus,
     complete = (adapterFilePresent && !fastqFilesMissing)
   ))
 }

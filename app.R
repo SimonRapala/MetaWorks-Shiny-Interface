@@ -149,9 +149,8 @@ ui <- page_navbar(
               class = "uploadLog",
               card_body(
                 h4("Upload Log"),
-                verbatimTextOutput(
-                  outputId = "uploadLogText",
-                  placeholder = TRUE
+                uiOutput(
+                  "uploadLogText"
                 )
               )
             )
@@ -1406,9 +1405,12 @@ server <- function(input, output, session) {
   classifierPath <- reactiveVal(defaultClassifier)
 
   # Clears a browsed classifier when the genetic marker changes
-  observeEvent(input$geneticMarker, {
-    classifierPath(defaultClassifier)
-  }, ignoreInit = TRUE)
+  observeEvent(input$geneticMarker,
+    {
+      classifierPath(defaultClassifier)
+    },
+    ignoreInit = TRUE
+  )
 
   # Connects the browse button to the classifier folder
   shinyFileChoose(
@@ -1473,31 +1475,36 @@ server <- function(input, output, session) {
     filetypes = c("fasta"),
     defaultRoot = "MetaWorks"
   )
-  output$uploadLogText <- renderText({
+  output$uploadLogText <- renderUI({
     fastqFiles <- if (is.list(input$fastqUploadButton)) {
-    parseFilePaths(metaworksRoot, input$fastqUploadButton)
-  } else {
-    data.frame(name = character(0), datapath = character(0))
-  }
+      parseFilePaths(metaworksRoot, input$fastqUploadButton)
+    } else {
+      data.frame(name = character(0), datapath = character(0))
+    }
 
-  adapterFiles <- if (is.list(input$fastaUploadButton)) {
-    parseFilePaths(metaworksRoot, input$fastaUploadButton)
-  } else {
-    data.frame(name = character(0), datapath = character(0))
-  }
+    adapterFiles <- if (is.list(input$fastaUploadButton)) {
+      parseFilePaths(metaworksRoot, input$fastaUploadButton)
+    } else {
+      data.frame(name = character(0), datapath = character(0))
+    }
 
-  filenames <- c(fastqFiles$name, adapterFiles$name)
+    filenames <- c(fastqFiles$name, adapterFiles$name)
 
-  req(length(filenames) > 0)
-  validate(
-    need(
-      anyDuplicated(filenames) == 0,
-      "No Duplicate File Names Allowed"
+    req(length(filenames) > 0)
+    validate(
+      need(
+        anyDuplicated(filenames) == 0,
+        "No Duplicate File Names Allowed"
+      )
     )
-  )
 
-  result <- checkFastQFiles(filenames)
-  paste(result$outputLog, collapse = "\n")
+    result <- checkFastQFiles(filenames)
+    tagList(lapply(seq_along(result$outputLog), function(i) {
+      tags$div(
+        class = paste("logMessage", result$outputLogStatus[i]),
+        result$outputLog[i]
+      )
+    }))
   })
 }
 

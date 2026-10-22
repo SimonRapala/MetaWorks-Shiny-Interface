@@ -218,3 +218,6 @@
 .modal-header{
   justify-content: space-between;
 }
+
+.logMessage.SUCCESS { color: #15803d; }
+.logMessage.ERROR   { color: #b91c1c; }
