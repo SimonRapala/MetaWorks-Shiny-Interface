@@ -4,7 +4,7 @@ library(bslib)
 library(shinyFiles)
 # Allows the use of external R files
 source("R/fileValidation.R")
-source("R/settingValidations.R")
+source("R/seqprepValidation.R")
 
 # The actual HTML and CSS displayed
 ui <- page_navbar(
@@ -334,7 +334,7 @@ ui <- page_navbar(
                     div(
                       class = "labelsBelow",
                       numericInput(
-                        inputId = "endQualityCutoffs",
+                        inputId = "endQualityCutoffs5prime",
                         label = "5′ end [Min: NA; Default: 20; Max: NA]",
                         value = 20,
                         step = 1
