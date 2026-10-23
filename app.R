@@ -715,12 +715,6 @@ ui <- page_navbar(
 
                       # Displays the classifier currently selected
                       textOutput("classifierPathText"),
-
-                      # Retains the old reset input until the source behaviour is updated
-                      div(
-                        style = "display: none;",
-                        actionButton("resetClassifier", "Use default COI")
-                      )
                     )
                   )
                 ),
@@ -1402,12 +1396,12 @@ server <- function(input, output, session) {
   )
 
   # Stores the selected classifier for this user's session
-  classifierPath <- reactiveVal(defaultClassifier)
+  externalClassifierPath <- reactiveVal(NULL)
 
   # Clears a browsed classifier when the genetic marker changes
   observeEvent(input$geneticMarker,
     {
-      classifierPath(defaultClassifier)
+      externalClassifierPath(NULL)
     },
     ignoreInit = TRUE
   )
@@ -1434,23 +1428,20 @@ server <- function(input, output, session) {
     )
 
     req(nrow(selectedFile) == 1)
-
-    classifierPath(as.character(selectedFile$datapath[1]))
-  })
-
-  # Returns the selection to the default COI classifier
-  observeEvent(input$resetClassifier, {
-    classifierPath(defaultClassifier)
+    externalClassifierPath(as.character(selectedFile$datapath[1]))
   })
 
   # Shows the current path below the browse button
   output$classifierPathText <- renderText({
-    # The included COI path is not an external selection
-    if (identical(classifierPath(), defaultClassifier)) {
+    if (!identical(input$classifierSource, "external")) {
       return("")
     }
 
-    classifierPath()
+    if (is.null(externalClassifierPath())) {
+      return("No external classifier selected")
+    }
+
+    externalClassifierPath()
   })
 
 
