@@ -4,6 +4,7 @@ library(bslib)
 library(shinyFiles)
 # Allows the use of external R files
 source("R/fileValidation.R")
+source("R/settingValidations.R")
 
 # The actual HTML and CSS displayed
 ui <- page_navbar(
@@ -130,7 +131,7 @@ ui <- page_navbar(
                 shinyFilesButton(
                   id = "fastqUploadButton",
                   multiple = TRUE, label = "Browse",
-                  title = "Select Read Fiels"
+                  title = "Select Read Files"
                 )
               )
             ),
@@ -150,7 +151,7 @@ ui <- page_navbar(
               card_body(
                 h4("Upload Log"),
                 uiOutput(
-                  "uploadLogText"
+                  outputId = "uploadLogText"
                 )
               )
             )
@@ -281,9 +282,8 @@ ui <- page_navbar(
                     h4("SEQPREP Log")
                   ),
                   card_body(
-                    verbatimTextOutput(
-                      outputId = "seqprepLogText",
-                      placeholder = TRUE
+                    uiOutput(
+                      "seqprepLogText"
                     )
                   )
                 )
@@ -1413,8 +1413,7 @@ server <- function(input, output, session) {
     roots = classifierRoots,
     session = session,
     filetypes = c("properties"),
-    defaultRoot = "Classifiers",
-    defaultPath = "COI"
+    defaultRoot = "Classifiers"
   )
 
   # Updates the saved path when a file is selected
@@ -1428,7 +1427,7 @@ server <- function(input, output, session) {
     )
 
     req(nrow(selectedFile) == 1)
-    externalClassifierPath(as.character(selectedFile$datapath[1]))
+    externalClassifierPath(as.character(selectedFile$datapath))
   })
 
   # Shows the current path below the browse button
@@ -1494,6 +1493,20 @@ server <- function(input, output, session) {
       tags$div(
         class = paste("logMessage", result$outputLogStatus[i]),
         result$outputLog[i]
+      )
+    }))
+  })
+
+  output$seqprepLogText <- renderUI({
+    resultsSEQPREP <- seqprepValidation(
+      input$phredQualityCutoff, input$minimumReadOverlap,
+      input$maximumMismatchFraction, input$minimumMatchOverlapFraction
+    )
+
+    tagList(lapply(seq_along(resultsSEQPREP$outputLog), function(i) {
+      tags$div(
+        class = paste("logMessage", resultsSEQPREP$outputLogStatus[i]),
+        resultsSEQPREP$outputLog[i]
       )
     }))
   })
