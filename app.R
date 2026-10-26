@@ -5,6 +5,9 @@ library(shinyFiles)
 # Allows the use of external R files
 source("R/fileValidation.R")
 source("R/seqprepValidation.R")
+source("R/cutadaptValidation.R")
+source("R/vsearchValidation.R")
+
 
 # The actual HTML and CSS displayed
 ui <- page_navbar(
@@ -483,6 +486,7 @@ ui <- page_navbar(
                         inputId = "minimumReadsPerCluster",
                         label = "[Min: 0; Default: 8; Max: NA]",
                         value = 8,
+                        min = 0,
                         step = 1
                       )
                     )
@@ -509,6 +513,7 @@ ui <- page_navbar(
                         inputId = "vsearchThreadCount",
                         label = "[Min: 0; Default: 15; Max: NA]",
                         value = 15,
+                        min = 0,
                         step = 1
                       )
                     )
@@ -1524,6 +1529,18 @@ server <- function(input, output, session) {
       )
     }))
   })
+
+  output$vsearchLogText <- renderUI({
+    resultsVSEARCH <- vsearchValidation(input$minimumReadsPerCluster, input$vsearchThreadCount)
+
+    tagList(lapply(seq_along(resultsVSEARCH$outputLog), function(i){
+      tags$div(
+        class = paste0("logMessage ", resultsVSEARCH$outputLogStatus[i]),
+        resultsVSEARCH$outputLog[i]
+      )
+    }))
+  })
+
 }
 
 shinyApp(ui = ui, server = server)

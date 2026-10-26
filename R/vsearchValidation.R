@@ -15,7 +15,7 @@ vsearchValidation <- function(minReadsCluster, threadCount){
     outputLogStatus <- c(outputLogStatus, "ERROR")
   } else {
     outputLog <- c(outputLog, paste0("Valid Minimum Reads per Cluster of ", minReadsCluster))
-    outputLogStatus <- c(outputLog, "SUCCESS")
+    outputLogStatus <- c(outputLogStatus, "SUCCESS")
     validMinReadCluster <- TRUE
   }
 
@@ -31,7 +31,7 @@ vsearchValidation <- function(minReadsCluster, threadCount){
     outputLogStatus <- c(outputLogStatus, "ERROR")
   } else {
     outputLog <- c(outputLog, paste0("Valid Thread Count of ", threadCount))
-    outputLogStatus <- c(outputLog, "SUCCESS")
+    outputLogStatus <- c(outputLogStatus, "SUCCESS")
     validThreadCount <- TRUE
   }
 
