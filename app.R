@@ -481,7 +481,7 @@ ui <- page_navbar(
                       class = "labelsBelow",
                       numericInput(
                         inputId = "minimumReadsPerCluster",
-                        label = "[Min: NA; Default: 8; Max: NA]",
+                        label = "[Min: 0; Default: 8; Max: NA]",
                         value = 8,
                         step = 1
                       )
@@ -507,7 +507,7 @@ ui <- page_navbar(
                       class = "labelsBelow",
                       numericInput(
                         inputId = "vsearchThreadCount",
-                        label = "[Min: NA; Default: 15; Max: NA]",
+                        label = "[Min: 0; Default: 15; Max: NA]",
                         value = 15,
                         step = 1
                       )
@@ -521,9 +521,8 @@ ui <- page_navbar(
                     h4("VSEARCH Log")
                   ),
                   card_body(
-                    verbatimTextOutput(
+                    uiOutput(
                       outputId = "vsearchLogText",
-                      placeholder = TRUE
                     )
                   )
                 )

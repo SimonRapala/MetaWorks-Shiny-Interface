@@ -19,7 +19,7 @@ cutadaptValidation <- function(
     outputLog <- c(outputLog, "Minimum Retained Sequence must be a whole number")
     outputLogStatus <- c(outputLogStatus, "ERROR")
   } else if (minRetainedSequence < 0) {
-    outputLog <- c(outputLog, "No negative numbers allowed")
+    outputLog <- c(outputLog, "Minimum Retained Sequence cannot be negative")
     outputLogStatus <- c(outputLogStatus, "ERROR")
   } else {
     outputLog <- c(outputLog, paste0("Valid Minimum Retained Sequence of ", minRetainedSequence))
@@ -34,7 +34,7 @@ cutadaptValidation <- function(
     outputLog <- c(outputLog, "End Quality Prime 5 must be a whole number")
     outputLogStatus <- c(outputLogStatus, "ERROR")
   } else if (endQuality5 < 0) {
-    outputLog <- c(outputLog, "No negative numbers allowed")
+    outputLog <- c(outputLog, "End Quality Prime 5 cannot be negative")
     outputLogStatus <- c(outputLogStatus, "ERROR")
   } else {
     outputLog <- c(outputLog, paste0("Valid End Quality Prime 5 of ", endQuality5))
@@ -49,7 +49,7 @@ cutadaptValidation <- function(
     outputLog <- c(outputLog, "End Quality Prime 3 must be a whole number")
     outputLogStatus <- c(outputLogStatus, "ERROR")
   } else if (endQuality3 < 0) {
-    outputLog <- c(outputLog, "No negative numbers allowed")
+    outputLog <- c(outputLog, "End Quality Prime 3 cannot be negative")
     outputLogStatus <- c(outputLogStatus, "ERROR")
   } else {
     outputLog <- c(outputLog, paste0("Valid End Quality Prime 3 of ", endQuality3))
@@ -76,7 +76,7 @@ cutadaptValidation <- function(
     outputLog <- c(outputLog, "Minimum Primer Overlap must be a whole number")
     outputLogStatus <- c(outputLogStatus, "ERROR")
   } else if (minPrimerOverlap < 0) {
-    outputLog <- c(outputLog, "No negative numbers allowed")
+    outputLog <- c(outputLog, "Minimum Primer Overlap cannot be negative")
     outputLogStatus <- c(outputLogStatus, "ERROR")
   } else {
     outputLog <- c(outputLog, paste0("Valid Minimum Primer Overlap of ", minPrimerOverlap))
@@ -91,7 +91,7 @@ cutadaptValidation <- function(
     outputLog <- c(outputLog, "Maximum Ambiguous Bases must be a whole number")
     outputLogStatus <- c(outputLogStatus, "ERROR")
   } else if (maxAmbiguousBases < 0) {
-    outputLog <- c(outputLog, "No negative numbers allowed")
+    outputLog <- c(outputLog, "Maximum Ambiguous Bases cannot be negative")
     outputLogStatus <- c(outputLogStatus, "ERROR")
   } else {
     outputLog <- c(outputLog, paste0("Valid Maximum Ambiguous Bases of ", maxAmbiguousBases))
