@@ -283,7 +283,7 @@ ui <- page_navbar(
                   ),
                   card_body(
                     uiOutput(
-                      "seqprepLogText"
+                      outputId = "seqprepLogText"
                     )
                   )
                 )
@@ -312,7 +312,7 @@ ui <- page_navbar(
                       class = "labelsBelow",
                       numericInput(
                         inputId = "minimumRetainedSequenceLength",
-                        label = "[Min: NA; Default: 150 bp; Max: NA]",
+                        label = "[Min: 0; Default: 150 bp; Max: NA]",
                         value = 150,
                         step = 1
                       )
@@ -334,15 +334,15 @@ ui <- page_navbar(
                     div(
                       class = "labelsBelow",
                       numericInput(
-                        inputId = "endQualityCutoffs5prime",
-                        label = "5′ end [Min: NA; Default: 20; Max: NA]",
+                        inputId = "endQualityCutoffs5Prime",
+                        label = "5′ end [Min: 0; Default: 20; Max: NA]",
                         value = 20,
                         step = 1
                       ),
                       # Separate input allows each read end to have its own cutoff
                       numericInput(
                         inputId = "endQualityCutoff3Prime",
-                        label = "3′ end [Min: NA; Default: 20; Max: NA]",
+                        label = "3′ end [Min: 0; Default: 20; Max: NA]",
                         value = 20,
                         step = 1
                       )
@@ -366,7 +366,7 @@ ui <- page_navbar(
                       class = "labelsBelow",
                       numericInput(
                         inputId = "maximumPrimerErrorRate",
-                        label = "[Min: NA; Default: 0.1 (10%); Max: NA]",
+                        label = "[Min: 0; Default: 0.1 (10%); Max: 0.99]",
                         value = 0.1,
                         step = 0.01
                       )
@@ -389,7 +389,7 @@ ui <- page_navbar(
                       class = "labelsBelow",
                       numericInput(
                         inputId = "minimumPrimerOverlap",
-                        label = "[Min: NA; Default: 3 bases; Max: NA]",
+                        label = "[Min: 0; Default: 3 bases; Max: NA]",
                         value = 3,
                         step = 1
                       )
@@ -412,7 +412,7 @@ ui <- page_navbar(
                       class = "labelsBelow",
                       numericInput(
                         inputId = "maximumAmbiguousBases",
-                        label = "[Min: NA; Default: 3; Max: NA]",
+                        label = "[Min: 0; Default: 3; Max: NA]",
                         value = 3,
                         step = 1
                       )
@@ -447,9 +447,8 @@ ui <- page_navbar(
                     h4("CUTADAPT Log")
                   ),
                   card_body(
-                    verbatimTextOutput(
-                      outputId = "cutadaptLogText",
-                      placeholder = TRUE
+                    uiOutput(
+                      outputId = "cutadaptLogOutput"
                     )
                   )
                 )
@@ -1507,6 +1506,22 @@ server <- function(input, output, session) {
       tags$div(
         class = paste("logMessage", resultsSEQPREP$outputLogStatus[i]),
         resultsSEQPREP$outputLog[i]
+      )
+    }))
+  })
+
+
+  output$cutadaptLogOutput <- renderUI({
+    resultsCUTADAPT <- cutadaptValidation(
+      input$minimumRetainedSequenceLength, input$endQualityCutoffs5Prime,
+      input$endQualityCutoff3Prime, input$maximumPrimerErrorRate,
+      input$minimumPrimerOverlap, input$maximumAmbiguousBases, input$reverseComplementSearch
+    )
+
+    tagList(lapply(seq_along(resultsCUTADAPT$outputLog), function(i) {
+      tags$div(
+        class = paste0("logMessage ", resultsCUTADAPT$outputLogStatus[i]),
+        resultsCUTADAPT$outputLog[i]
       )
     }))
   })

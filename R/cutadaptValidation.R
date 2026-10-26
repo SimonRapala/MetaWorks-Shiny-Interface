@@ -65,7 +65,7 @@ cutadaptValidation <- function(
     outputLogStatus <- c(outputLogStatus, "SUCCESS")
     validMaxPrimerError <- TRUE
   } else {
-    outputLog <- c(outputLog, "Value has to be in a range of 0 to 1.00")
+    outputLog <- c(outputLog, "Max Primer Error must be at least 0 and less than 1")
     outputLogStatus <- c(outputLogStatus, "ERROR")
   }
 
@@ -98,6 +98,13 @@ cutadaptValidation <- function(
     outputLogStatus <- c(outputLogStatus, "SUCCESS")
     validMaxAmbiguousBases <- TRUE
   }
+
+  if (reverseComplementSearch){
+    outputLog <- c(outputLog, "Reverse Complement Search is enabled")
+  } else {
+    outputLog <- c(outputLog, "Reverse Complement Search is disabled")
+  }
+  outputLogStatus <- c(outputLogStatus, "SUCCESS")
 
   return(list(
     minRetainedSequence = minRetainedSequence,
