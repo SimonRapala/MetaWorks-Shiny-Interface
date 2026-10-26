@@ -728,9 +728,8 @@ ui <- page_navbar(
                     h4("Classification Log")
                   ),
                   card_body(
-                    verbatimTextOutput(
-                      outputId = "classificationLogText",
-                      placeholder = TRUE
+                    uiOutput(
+                      outputId = "classificationLogText"
                     )
                   )
                 )
@@ -1533,7 +1532,7 @@ server <- function(input, output, session) {
   output$vsearchLogText <- renderUI({
     resultsVSEARCH <- vsearchValidation(input$minimumReadsPerCluster, input$vsearchThreadCount)
 
-    tagList(lapply(seq_along(resultsVSEARCH$outputLog), function(i){
+    tagList(lapply(seq_along(resultsVSEARCH$outputLog), function(i) {
       tags$div(
         class = paste0("logMessage ", resultsVSEARCH$outputLogStatus[i]),
         resultsVSEARCH$outputLog[i]
@@ -1541,6 +1540,24 @@ server <- function(input, output, session) {
     }))
   })
 
+  output$classificationLogText <- renderUI({
+    resultsClassifier <- classificationValidation(
+      genMarker = input$geneticMarker,
+      itsRegion = input$itsRegion,
+      memAllocation = input$rdpMemoryAllocation,
+      classifierSource = input$classifierSource,
+      externalPath = externalClassifierPath(),
+      fungalITSReference = input$builtInFungalClassifier
+    )
+
+
+    tagList(lapply(seq_along(resultsClassifier$outputLog), function(i) {
+      tags$div(
+        class = paste0("logMessage ", resultsClassifier$outputLogStatus[i]),
+        resultsClassifier$outputLog[i]
+      )
+    }))
+  })
 }
 
 shinyApp(ui = ui, server = server)
