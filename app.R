@@ -1080,9 +1080,8 @@ ui <- page_navbar(
                     h4("Pseudogene filtering Log")
                   ),
                   card_body(
-                    verbatimTextOutput(
-                      outputId = "pseudogeneLogText",
-                      placeholder = TRUE
+                    uiOutput(
+                      outputId = "pseudogeneLogText"
                     )
                   )
                 )
@@ -1191,7 +1190,7 @@ ui <- page_navbar(
         actionButton("showVsearch", "VSEARCH"),
         actionButton("showMarkers", "Markers"),
         actionButton("showItspart", "ITSpart"),
-        actionButton("showPseudogene", "Psuedogene Filtering"),
+        actionButton("showPseudogene", "Pseudogene Filtering"),
         actionButton("showOrffinder", "ORFFINDER"),
         actionButton("showOther", "Other")
       ),
@@ -1345,6 +1344,12 @@ server <- function(input, output, session) {
       condition = (
         input$geneticMarker %in% c("ITS_fungi") &&
           identical(input$classifierSource, "builtin")
+      )
+    )
+    shinyjs::toggleState(
+      id = "hmmProfile",
+      condition = (
+        identical(input$pseudogeneRemovalMethod, "2") && isTRUE(input$enablePseudogeneFiltering)
       )
     )
   })
@@ -1557,6 +1562,10 @@ server <- function(input, output, session) {
         resultsClassifier$outputLog[i]
       )
     }))
+  })
+
+  output$pseudogeneLogText <- renderUI({
+
   })
 }
 
