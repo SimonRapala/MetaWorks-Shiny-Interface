@@ -38,12 +38,13 @@ classificationValidation <- function(
     "16S (built-in available)" = "16S"
   )
   fungalITSReferences <- c(
-    "fungalits_warcup", 
+    "fungalits_warcup",
     "fungalits_unite"
-    )
+  )
   outputLog <- character(0)
   outputLogStatus <- character(0)
 
+  #Ensures there is only 1 input and that it is in the list of possible inputs for markers
   if (length(genMarker) == 1 && genMarker %in% markers) {
     outputLog <- c(outputLog, "Valid Marker Chosen")
     outputLogStatus <- c(outputLogStatus, "SUCCESS")
@@ -53,7 +54,9 @@ classificationValidation <- function(
     validMarker <- FALSE
   }
 
+  # Ensures that only runs this if the selection is valid and is an ITS marker
   if (validMarker && genMarker %in% its) {
+    # Checks that only one input region was given and that selection is valid and is an ITS region
     if (length(itsRegion) == 1 && itsRegion %in% itsRegions) {
       outputLog <- c(outputLog, "Valid ITS region")
       outputLogStatus <- c(outputLogStatus, "SUCCESS")
@@ -64,14 +67,17 @@ classificationValidation <- function(
     }
   }
 
+  # Ensures that only 1 number is input, that it is a number, that it is not INF or NA
   if (length(memAllocation) != 1 || !is.numeric(memAllocation) || !is.finite(memAllocation)) {
     outputLog <- c(outputLog, "Memory Allocation is required and needs a valid number")
     outputLogStatus <- c(outputLogStatus, "ERROR")
     validMemAllocation <- FALSE
+    #Ensures that allocated memory is not negative
   } else if (memAllocation <= 0) {
     outputLog <- c(outputLog, "Memory Allocation must be greater than 0")
     outputLogStatus <- c(outputLogStatus, "ERROR")
     validMemAllocation <- FALSE
+    #Ensures allocated memory is a whole number
   } else if (memAllocation %% 1 != 0) {
     outputLog <- c(outputLog, "Memory Allocation must be a whole number")
     outputLogStatus <- c(outputLogStatus, "ERROR")
@@ -81,14 +87,17 @@ classificationValidation <- function(
     outputLogStatus <- c(outputLogStatus, "SUCCESS")
   }
 
-
+  #Ensures that marker is valid
   if (validMarker) {
+    # Ensures there is only one selection for the source and that it is an existing option
     if (length(classifierSource) != 1 ||
       !classifierSource %in% c("included", "builtin", "external")) {
       outputLog <- c(outputLog, "Choose a valid classifier source")
       outputLogStatus <- c(outputLogStatus, "ERROR")
       validClassifierSource <- FALSE
+      # Branch for in COI classifier shipped with interface
     } else if (classifierSource == "included") {
+      # Ensures that the Marker is COI
       if (genMarker == "COI") {
         outputLog <- c(outputLog, "Included COI classifier selected")
         outputLogStatus <- c(outputLogStatus, "SUCCESS")
@@ -97,11 +106,14 @@ classificationValidation <- function(
         outputLogStatus <- c(outputLogStatus, "ERROR")
         validClassifierSource <- FALSE
       }
+      # Branchfor using classifiers shipped with Metaworks
     } else if (classifierSource == "builtin") {
+      # Ensures selected marker has a builtin classifier
       if (!genMarker %in% builtIn) {
         outputLog <- c(outputLog, "No built-in classifier for this marker")
         outputLogStatus <- c(outputLogStatus, "ERROR")
         validClassifierSource <- FALSE
+        # If the marker has built in classifier and is the ITS Fungi marker, checks user selection for option
       } else if (genMarker == "ITS_fungi") {
         if (length(fungalITSReference) == 1 &&
           fungalITSReference %in% fungalITSReferences) {
@@ -112,11 +124,14 @@ classificationValidation <- function(
           outputLogStatus <- c(outputLogStatus, "ERROR")
           validFungalITSReference <- FALSE
         }
+        # If is valid and not ITS Fungi, then valid selection
       } else {
         outputLog <- c(outputLog, "Built-in classifier selected")
         outputLogStatus <- c(outputLogStatus, "SUCCESS")
       }
+      # Branch for external classifier
     } else if (classifierSource == "external") {
+      # Ensures one choice, the path is a string, is not NA, and exists as a file not directory
       if (length(externalPath) != 1 ||
         !is.character(externalPath) ||
         is.na(externalPath) ||
@@ -132,7 +147,8 @@ classificationValidation <- function(
       }
     }
   }
-
+  #Returns a list of all the settings, and if they were validated 
+  #even if not being used, along with an output log and status log
   return(list(
     valid = validMarker && validITSRegion && validMemAllocation &&
       validClassifierSource && validExternalPath &&
