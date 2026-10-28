@@ -25,6 +25,15 @@ pseudogeneValidation <- function(
   removalMethods <- c(
     "1", "2"
   )
+  geneticCodes <- c(
+    "1", "2", "5"
+  )
+  codonBehaviours <- c(
+    "0", "1", "2"
+  )
+  orfStrands <- c(
+    "plus", "minus", "both"
+  )
   outputLog <- character(0)
   outputLogStatus <- character(0)
 
@@ -73,8 +82,53 @@ pseudogeneValidation <- function(
       }
     }
 
-    if (){
-      
+    if (length(geneticCode) != 1 || !geneticCode %in% geneticCodes || !is.character(geneticCode)) {
+      outputLog <- c(outputLog, "The Genetic Code choice needs to be a valid option")
+      outputLogStatus <- c(outputLogStatus, "ERROR")
+      validGeneticCode <- FALSE
+    } else {
+      outputLog <- c(outputLog, "Valid Genetic Code choice")
+      outputLogStatus <- c(outputLogStatus, "SUCCESS")
+    }
+
+    if (length(codonBehaviour) != 1 || !codonBehaviour %in% codonBehaviours || !is.character(codonBehaviour)) {
+      outputLog <- c(outputLog, "The Codon Behaviour choice needs to be a valid option")
+      outputLogStatus <- c(outputLogStatus, "ERROR")
+      validCodonBehaviour <- FALSE
+    } else {
+      outputLog <- c(outputLog, "Valid Codon Behaviour choice")
+      outputLogStatus <- c(outputLogStatus, "SUCCESS")
+    }
+
+    if (length(minORFLength) != 1 || !is.numeric(minORFLength) || !is.finite(minORFLength)) {
+      outputLog <- c(outputLog, "The Minimum ORF Length needs to be a valid whole number")
+      outputLogStatus <- c(outputLogStatus, "ERROR")
+      validCodonBehaviour <- FALSE
+    } else if (minORFLength < 30 || minORFLength > 1000) {
+      outputLog <- c(outputLog, "The Minimum ORF Length cannot be outside of allowed range")
+      outputLogStatus <- c(outputLogStatus, "ERROR")
+      validMinORFLength <- FALSE
+    } else {
+      outputLog <- c(outputLog, "Minimum ORF Length is a valid number within the range")
+      outputLogStatus <- c(outputLogStatus, "SUCCESS")
+    }
+
+    if (length(ignoreNestedORF) != 1 || !is.logical(ignoreNestedORF) || !is.na(ignoreNestedORF)) {
+      outputLog <- c(outputLog, "Ignore Nested ORF needs to have a valid logical choice")
+      outputLogStatus <- c(outputLogStatus, "ERROR")
+      validIgnoreNestedORF <- FALSE
+    } else {
+      outputLog <- c(outputLog, "Ignore Nested ORF has a valid state")
+      outputLogStatus <- c(outputLogStatus, "SUCCESS")
+    }
+    orfStrand <- tolower(orfStrand)
+    if (length(orfStrand) != 1 || !orfStrand %in% orfStrands || !is.character(orfStrand)) {
+      outputLog <- c(outputLog, "ORF Strand needs to be a valid choice")
+      outputLogStatus <- c(outputLogStatus, "ERROR")
+      validORFStrand <- FALSE
+    } else {
+      outputLog <- c(outputLog, "ORF Strand selection is valid")
+      outputLogStatus <- c(outputLogStatus, "SUCCESS")
     }
   } else if (validEnableFiltering && !enableFiltering) {
     outputLog <- c(outputLog, "Pseudogene Filtering is disabled")
@@ -83,4 +137,32 @@ pseudogeneValidation <- function(
     outputLog <- c(outputLog, "Pseudogene Filtering does not have a valid input")
     outputLogStatus <- c(outputLogStatus, "ERROR")
   }
+
+  return(list(
+    enableFiltering = enableFiltering,
+    filteringType = filteringType,
+    primaryFilter = primaryFilter,
+    secondaryFilter = secondaryFilter,
+    removalMethod = removalMethod,
+    hmmProfile = hmmProfile,
+    geneticCode = geneticCode,
+    codonBehaviour = codonBehaviour,
+    minORFLength = minORFLength,
+    ignoreNestedORF = ignoreNestedORF,
+    orfStrand = orfStrand,
+    valid = (
+      validEnableFiltering &&
+        validFilteringType &&
+        validPrimaryFilter &&
+        validSecondaryFilter &&
+        validRemovalMethod &&
+        validHMMProfile &&
+        validGeneticCode &&
+        validCodonBehaviour &&
+        validMinORFLength &&
+        validIgnoreNestedORF &&
+        validORFStrand),
+    outputLog = outputLog,
+    outputLogStatus = outputLogStatus
+  ))
 }
