@@ -1565,8 +1565,27 @@ server <- function(input, output, session) {
   })
 
   output$pseudogeneLogText <- renderUI({
+  resultsPseudogene <- pseudogeneValidation(
+    enableFiltering = input$enablePseudogeneFiltering,
+    filteringType = input$taxonomicFilteringType,
+    primaryFilter = input$primaryTaxonomicFilter,
+    secondaryFilter = input$secondaryTaxonomicFilter,
+    removalMethod = input$pseudogeneRemovalMethod,
+    hmmProfile = input$hmmProfile,
+    geneticCode = input$geneticCode,
+    codonBehaviour = input$startCodonBehaviour,
+    minORFLength = input$minimumOrfLength,
+    ignoreNestedORF = input$ignoreNestedOrfs,
+    orfStrand = input$orfStrand
+  )
 
-  })
+  tagList(lapply(seq_along(resultsPseudogene$outputLog), function(i) {
+    tags$div(
+      class = paste0("logMessage ", resultsPseudogene$outputLogStatus[i]),
+      resultsPseudogene$outputLog[i]
+    )
+  }))
+})
 }
 
 shinyApp(ui = ui, server = server)

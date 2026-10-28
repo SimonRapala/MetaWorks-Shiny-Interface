@@ -6,9 +6,11 @@ pseudogeneValidation <- function(
   minORFLength, ignoreNestedORF,
   orfStrand
 ) {
+  # Ensures that the selection is either TRUE or FALSE
   validEnableFiltering <- length(enableFiltering) == 1 &&
     is.logical(enableFiltering) &&
     !is.na(enableFiltering)
+  # Flag used to decide validation later
   validFilteringType <- TRUE
   validPrimaryFilter <- TRUE
   validSecondaryFilter <- TRUE
@@ -19,6 +21,7 @@ pseudogeneValidation <- function(
   validMinORFLength <- TRUE
   validIgnoreNestedORF <- TRUE
   validORFStrand <- TRUE
+  # Vectors with popssible options for checks
   filteringTypes <- c(
     "1", "2"
   )
@@ -34,11 +37,13 @@ pseudogeneValidation <- function(
   orfStrands <- c(
     "plus", "minus", "both"
   )
+  #Tracking ERRORS and SUCCESSES
   outputLog <- character(0)
   outputLogStatus <- character(0)
 
-
+  # These chcecks will only occur if user selects to use Filtering and it is not invalid
   if (validEnableFiltering && enableFiltering) {
+    # Ensures only one entry, it is a valid option and is a char or string
     if (length(filteringType) != 1 || !filteringType %in% filteringTypes || !is.character(filteringType)) {
       outputLog <- c(outputLog, "Filtering Type Needs to be a valid choice")
       outputLogStatus <- c(outputLogStatus, "ERROR")
@@ -103,7 +108,7 @@ pseudogeneValidation <- function(
     if (length(minORFLength) != 1 || !is.numeric(minORFLength) || !is.finite(minORFLength)) {
       outputLog <- c(outputLog, "The Minimum ORF Length needs to be a valid whole number")
       outputLogStatus <- c(outputLogStatus, "ERROR")
-      validCodonBehaviour <- FALSE
+      validMinORFLength <- FALSE
     } else if (minORFLength < 30 || minORFLength > 1000) {
       outputLog <- c(outputLog, "The Minimum ORF Length cannot be outside of allowed range")
       outputLogStatus <- c(outputLogStatus, "ERROR")
@@ -113,7 +118,7 @@ pseudogeneValidation <- function(
       outputLogStatus <- c(outputLogStatus, "SUCCESS")
     }
 
-    if (length(ignoreNestedORF) != 1 || !is.logical(ignoreNestedORF) || !is.na(ignoreNestedORF)) {
+    if (length(ignoreNestedORF) != 1 || !is.logical(ignoreNestedORF) || is.na(ignoreNestedORF)) {
       outputLog <- c(outputLog, "Ignore Nested ORF needs to have a valid logical choice")
       outputLogStatus <- c(outputLogStatus, "ERROR")
       validIgnoreNestedORF <- FALSE
