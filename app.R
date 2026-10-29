@@ -7,6 +7,9 @@ source("R/fileValidation.R")
 source("R/seqprepValidation.R")
 source("R/cutadaptValidation.R")
 source("R/vsearchValidation.R")
+source("R/classificationValidation.R")
+source("R/pseudogeneValidation.R")
+source("R/outputValidation.R")
 
 
 # The actual HTML and CSS displayed
@@ -1136,9 +1139,8 @@ ui <- page_navbar(
                     h4("Output Log")
                   ),
                   card_body(
-                    verbatimTextOutput(
-                      outputId = "outputLogText",
-                      placeholder = TRUE
+                    uiOutput(
+                      outputId = "outputLogText"
                     )
                   )
                 )
@@ -1586,6 +1588,20 @@ server <- function(input, output, session) {
     )
   }))
 })
+
+output$outputLogText <- renderUI({
+  resultsOutput <- outputValidation(
+    reportType = input$reportType
+  )
+
+  tagList(lapply(seq_along(resultsOutput$outputLog), function(i){
+    tags$div(
+    class = paste0("logMessage ", resultsOutput$outputLogStatus[i]),
+    resultsOutput$outputLog[i]
+  )
+  }))
+})
+
 }
 
 shinyApp(ui = ui, server = server)
