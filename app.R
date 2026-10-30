@@ -10,6 +10,7 @@ source("R/vsearchValidation.R")
 source("R/classificationValidation.R")
 source("R/pseudogeneValidation.R")
 source("R/outputValidation.R")
+source("R/reviewValidation.R")
 
 
 # The actual HTML and CSS displayed
@@ -1689,6 +1690,61 @@ server <- function(input, output, session) {
       )
     }))
   })
+
+  resultsReview <- reactive(
+    reviewValidation(
+      resultsSEQPREP(),
+      resultsCUTADAPT(),
+      resultsVSEARCH(),
+      resultsClassifier(),
+      resultsPseudogene(),
+      resultsOutput()
+    )
+  )
+
+  output$reviewSEQPREPLog <- renderUI({
+    messages <- resultsReview()$seqprepLog
+
+    tagList(lapply(messages, function(message) {
+      tags$div(class = "logMessage", message)
+    }))
+  })
+  output$reviewCUTADAPTLog <- renderUI({
+    messages <- resultsReview()$cutadaptLog
+
+    tagList(lapply(messages, function(message) {
+      tags$div(class = "logMessage", message)
+    }))
+  })
+  output$reviewVSEARCHLog <- renderUI({
+    messages <- resultsReview()$vsearchLog
+
+    tagList(lapply(messages, function(message) {
+      tags$div(class = "logMessage", message)
+    }))
+  })
+  output$reviewClassificationLog <- renderUI({
+    messages <- resultsReview()$classificationLog
+
+    tagList(lapply(messages, function(message) {
+      tags$div(class = "logMessage", message)
+    }))
+  })
+  output$reviewPseudogeneLog <- renderUI({
+    messages <- resultsReview()$pseudogeneLog
+
+    tagList(lapply(messages, function(message) {
+      tags$div(class = "logMessage", message)
+    }))
+  })
+  output$reviewOutputLog <- renderUI({
+    messages <- resultsReview()$outputLog
+
+    tagList(lapply(messages, function(message) {
+      tags$div(class = "logMessage", message)
+    }))
+  })
+
 }
 
 shinyApp(ui = ui, server = server)
