@@ -164,30 +164,31 @@ pseudogeneValidation <- function(
   }
   # Returns a list with all user choices, a logical value if success or error, along with a log and status log
   return(list(
-    enableFiltering = enableFiltering,
-    filteringType = filteringType,
-    primaryFilter = primaryFilter,
-    secondaryFilter = secondaryFilter,
-    removalMethod = removalMethod,
-    hmmProfile = hmmProfile,
-    geneticCode = geneticCode,
-    codonBehaviour = codonBehaviour,
-    minORFLength = minORFLength,
-    ignoreNestedORF = ignoreNestedORF,
-    orfStrand = orfStrand,
-    valid = (
-      validEnableFiltering &&
-        validFilteringType &&
-        validPrimaryFilter &&
-        validSecondaryFilter &&
-        validRemovalMethod &&
-        validHMMProfile &&
-        validGeneticCode &&
-        validCodonBehaviour &&
-        validMinORFLength &&
-        validIgnoreNestedORF &&
-        validORFStrand),
-    outputLog = outputLog,
-    outputLogStatus = outputLogStatus
-  ))
+  enableFiltering = list(value = enableFiltering, valid = validEnableFiltering),
+  filteringType = list(value = filteringType, valid = validFilteringType),
+  primaryFilter = list(value = primaryFilter, valid = validPrimaryFilter),
+  secondaryFilter = list(value = secondaryFilter, valid = validSecondaryFilter),
+  removalMethod = list(value = removalMethod, valid = validRemovalMethod),
+  hmmProfile = list(value = hmmProfile, valid = validHMMProfile),
+  geneticCode = list(value = geneticCode, valid = validGeneticCode),
+  codonBehaviour = list(value = codonBehaviour, valid = validCodonBehaviour),
+  minORFLength = list(value = minORFLength, valid = validMinORFLength),
+  ignoreNestedORF = list(value = ignoreNestedORF, valid = validIgnoreNestedORF),
+  orfStrand = list(value = orfStrand, valid = validORFStrand),
+
+  valid = validEnableFiltering &&
+    validFilteringType &&
+    validPrimaryFilter &&
+    validSecondaryFilter &&
+    validRemovalMethod &&
+    validHMMProfile &&
+    validGeneticCode &&
+    validCodonBehaviour &&
+    validMinORFLength &&
+    validIgnoreNestedORF &&
+    validORFStrand,
+
+  outputLog = outputLog,
+  outputLogStatus = outputLogStatus
+))
 }

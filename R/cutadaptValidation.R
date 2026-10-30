@@ -9,6 +9,7 @@ cutadaptValidation <- function(
   validMaxPrimerError <- FALSE
   validMinPrimerOverlap <- FALSE
   validMaxAmbiguousBases <- FALSE
+  validReverseComplementSearch <- FALSE
   outputLog <- character(0)
   outputLogStatus <- character(0)
 
@@ -99,24 +100,40 @@ cutadaptValidation <- function(
     validMaxAmbiguousBases <- TRUE
   }
 
-  if (reverseComplementSearch){
+  if (identical(reverseComplementSearch, TRUE)){
     outputLog <- c(outputLog, "Reverse Complement Search is enabled")
-  } else {
+    outputLogStatus <- c(outputLogStatus, "SUCCESS")
+    validReverseComplementSearch <- TRUE
+  } else if (identical(reverseComplementSearch, FALSE)){
     outputLog <- c(outputLog, "Reverse Complement Search is disabled")
+    outputLogStatus <- c(outputLogStatus, "SUCCESS")
+    validReverseComplementSearch <- TRUE
+  } else {
+    outputLog <- c(outputLog, "Reverse Complement Search needs to be a valid logical choice")
+    outputLogStatus <- c(outputLogStatus, "ERROR")
   }
-  outputLogStatus <- c(outputLogStatus, "SUCCESS")
 
   return(list(
-    minRetainedSequence = minRetainedSequence,
-    endQuality5 = endQuality5,
-    endQuality3 = endQuality3,
-    maxPrimerError = maxPrimerError,
-    minPrimerOverlap = minPrimerOverlap,
-    maxAmbiguousBases = maxAmbiguousBases,
-    reverseComplementSearch = reverseComplementSearch,
-    outputLog = outputLog,
-    outputLogStatus = outputLogStatus,
-    valid = (validMinRetainedSequence && validEndQuality5 && validEndQuality3 &&
-      validMaxPrimerError && validMinPrimerOverlap && validMaxAmbiguousBases)
-  ))
+  minRetainedSequence = list(
+    value = minRetainedSequence, valid = validMinRetainedSequence
+  ),
+  endQuality5 = list(value = endQuality5, valid = validEndQuality5),
+  endQuality3 = list(value = endQuality3, valid = validEndQuality3),
+  maxPrimerError = list(value = maxPrimerError, valid = validMaxPrimerError),
+  minPrimerOverlap = list(value = minPrimerOverlap, valid = validMinPrimerOverlap),
+  maxAmbiguousBases = list(value = maxAmbiguousBases, valid = validMaxAmbiguousBases),
+  reverseComplementSearch = list(
+    value = reverseComplementSearch, valid = validReverseComplementSearch
+  ),
+
+  outputLog = outputLog,
+  outputLogStatus = outputLogStatus,
+  valid = validMinRetainedSequence &&
+    validEndQuality5 &&
+    validEndQuality3 &&
+    validMaxPrimerError &&
+    validMinPrimerOverlap &&
+    validMaxAmbiguousBases &&
+    validReverseComplementSearch
+))
 }

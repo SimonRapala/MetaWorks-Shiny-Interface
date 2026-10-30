@@ -18,7 +18,7 @@ outputValidation <- function(
   }
 
   return(list(
-    reportType = reportType,
+    reportType = list(value = reportType, valid = validReportType),
     valid = (validReportType),
     outputLog = outputLog,
     outputLogStatus = outputLogStatus

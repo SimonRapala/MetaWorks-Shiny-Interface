@@ -36,8 +36,8 @@ vsearchValidation <- function(minReadsCluster, threadCount){
   }
 
   return(list(
-    minReadsCluster = minReadsCluster,
-    threadCount = threadCount,
+    minReadsCluster = list(value = minReadsCluster, valid = validMinReadCluster),
+    threadCount = list(value = threadCount, valid = validThreadCount),
     outputLog = outputLog,
     outputLogStatus = outputLogStatus,
     valid = (validMinReadCluster && validThreadCount)
