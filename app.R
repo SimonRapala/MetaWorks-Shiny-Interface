@@ -1543,7 +1543,7 @@ server <- function(input, output, session) {
     filetypes = c("fasta"),
     defaultRoot = "MetaWorks"
   )
-  output$uploadLogText <- renderUI({
+  resultUploads <- reactive({
     fastqFiles <- if (is.list(input$fastqUploadButton)) {
       parseFilePaths(metaworksRoot, input$fastqUploadButton)
     } else {
@@ -1566,7 +1566,12 @@ server <- function(input, output, session) {
       )
     )
 
-    result <- checkFastQFiles(filenames)
+    checkFastQFiles(filenames)
+  })
+
+  output$uploadLogText <- renderUI({
+    result <- resultUploads()
+
     tagList(lapply(seq_along(result$outputLog), function(i) {
       tags$div(
         class = paste("logMessage", result$outputLogStatus[i]),
@@ -1575,49 +1580,57 @@ server <- function(input, output, session) {
     }))
   })
 
-  output$seqprepLogText <- renderUI({
-    resultsSEQPREP <- seqprepValidation(
+
+  resultsSEQPREP <- reactive({
+    seqprepValidation(
       input$phredQualityCutoff, input$minimumReadOverlap,
       input$maximumMismatchFraction, input$minimumMatchOverlapFraction
     )
-
-    tagList(lapply(seq_along(resultsSEQPREP$outputLog), function(i) {
+  })
+  output$seqprepLogText <- renderUI({
+    results <- resultsSEQPREP()
+    tagList(lapply(seq_along(results$outputLog), function(i) {
       tags$div(
-        class = paste("logMessage", resultsSEQPREP$outputLogStatus[i]),
-        resultsSEQPREP$outputLog[i]
+        class = paste("logMessage", results$outputLogStatus[i]),
+        results$outputLog[i]
       )
     }))
   })
 
 
-  output$cutadaptLogOutput <- renderUI({
-    resultsCUTADAPT <- cutadaptValidation(
+  resultsCUTADAPT <- reactive({
+    cutadaptValidation(
       input$minimumRetainedSequenceLength, input$endQualityCutoffs5Prime,
       input$endQualityCutoff3Prime, input$maximumPrimerErrorRate,
       input$minimumPrimerOverlap, input$maximumAmbiguousBases, input$reverseComplementSearch
     )
-
-    tagList(lapply(seq_along(resultsCUTADAPT$outputLog), function(i) {
+  })
+  output$cutadaptLogOutput <- renderUI({
+    results <- resultsCUTADAPT()
+    tagList(lapply(seq_along(results$outputLog), function(i) {
       tags$div(
-        class = paste0("logMessage ", resultsCUTADAPT$outputLogStatus[i]),
-        resultsCUTADAPT$outputLog[i]
+        class = paste0("logMessage ", results$outputLogStatus[i]),
+        results$outputLog[i]
       )
     }))
   })
 
+  resultsVSEARCH <- reactive({
+    vsearchValidation(input$minimumReadsPerCluster, input$vsearchThreadCount)
+  })
   output$vsearchLogText <- renderUI({
-    resultsVSEARCH <- vsearchValidation(input$minimumReadsPerCluster, input$vsearchThreadCount)
-
-    tagList(lapply(seq_along(resultsVSEARCH$outputLog), function(i) {
+    results <- resultsVSEARCH()
+    tagList(lapply(seq_along(results$outputLog), function(i) {
       tags$div(
-        class = paste0("logMessage ", resultsVSEARCH$outputLogStatus[i]),
-        resultsVSEARCH$outputLog[i]
+        class = paste0("logMessage ", results$outputLogStatus[i]),
+        results$outputLog[i]
       )
     }))
   })
 
-  output$classificationLogText <- renderUI({
-    resultsClassifier <- classificationValidation(
+
+  resultsClassifier <- reactive({
+    classificationValidation(
       genMarker = input$geneticMarker,
       itsRegion = input$itsRegion,
       memAllocation = input$rdpMemoryAllocation,
@@ -1625,52 +1638,57 @@ server <- function(input, output, session) {
       externalPath = externalClassifierPath(),
       fungalITSReference = input$builtInFungalClassifier
     )
-
-
-    tagList(lapply(seq_along(resultsClassifier$outputLog), function(i) {
+  })
+  output$classificationLogText <- renderUI({
+    results <- resultsClassifier()
+    tagList(lapply(seq_along(results$outputLog), function(i) {
       tags$div(
-        class = paste0("logMessage ", resultsClassifier$outputLogStatus[i]),
-        resultsClassifier$outputLog[i]
+        class = paste0("logMessage ", results$outputLogStatus[i]),
+        results$outputLog[i]
       )
     }))
   })
 
-  output$pseudogeneLogText <- renderUI({
-  resultsPseudogene <- pseudogeneValidation(
-    enableFiltering = input$enablePseudogeneFiltering,
-    filteringType = input$taxonomicFilteringType,
-    primaryFilter = input$primaryTaxonomicFilter,
-    secondaryFilter = input$secondaryTaxonomicFilter,
-    removalMethod = input$pseudogeneRemovalMethod,
-    hmmProfile = input$hmmProfile,
-    geneticCode = input$geneticCode,
-    codonBehaviour = input$startCodonBehaviour,
-    minORFLength = input$minimumOrfLength,
-    ignoreNestedORF = input$ignoreNestedOrfs,
-    orfStrand = input$orfStrand
-  )
-
-  tagList(lapply(seq_along(resultsPseudogene$outputLog), function(i) {
-    tags$div(
-      class = paste0("logMessage ", resultsPseudogene$outputLogStatus[i]),
-      resultsPseudogene$outputLog[i]
+  resultsPseudogene <- reactive({
+    pseudogeneValidation(
+      enableFiltering = input$enablePseudogeneFiltering,
+      filteringType = input$taxonomicFilteringType,
+      primaryFilter = input$primaryTaxonomicFilter,
+      secondaryFilter = input$secondaryTaxonomicFilter,
+      removalMethod = input$pseudogeneRemovalMethod,
+      hmmProfile = input$hmmProfile,
+      geneticCode = input$geneticCode,
+      codonBehaviour = input$startCodonBehaviour,
+      minORFLength = input$minimumOrfLength,
+      ignoreNestedORF = input$ignoreNestedOrfs,
+      orfStrand = input$orfStrand
     )
-  }))
-})
+  })
+  output$pseudogeneLogText <- renderUI({
+    results <- resultsPseudogene()
+    tagList(lapply(seq_along(results$outputLog), function(i) {
+      tags$div(
+        class = paste0("logMessage ", results$outputLogStatus[i]),
+        results$outputLog[i]
+      )
+    }))
+  })
 
-output$outputLogText <- renderUI({
-  resultsOutput <- outputValidation(
-    reportType = input$reportType
-  )
 
-  tagList(lapply(seq_along(resultsOutput$outputLog), function(i){
-    tags$div(
-    class = paste0("logMessage ", resultsOutput$outputLogStatus[i]),
-    resultsOutput$outputLog[i]
-  )
-  }))
-})
-
+  resultsOutput <- reactive({
+    outputValidation(
+      reportType = input$reportType
+    )
+  })
+  output$outputLogText <- renderUI({
+    results <- resultsOutput()
+    tagList(lapply(seq_along(results$outputLog), function(i) {
+      tags$div(
+        class = paste0("logMessage ", results$outputLogStatus[i]),
+        results$outputLog[i]
+      )
+    }))
+  })
 }
 
 shinyApp(ui = ui, server = server)
