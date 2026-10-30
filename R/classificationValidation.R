@@ -150,16 +150,20 @@ classificationValidation <- function(
   #Returns a list of all the settings, and if they were validated 
   #even if not being used, along with an output log and status log
   return(list(
-    valid = validMarker && validITSRegion && validMemAllocation &&
-      validClassifierSource && validExternalPath &&
-      validFungalITSReference,
-    genMarker = genMarker,
-    itsRegion = itsRegion,
-    memAllocation = memAllocation,
-    classifierSource = classifierSource,
-    externalPath = externalPath,
-    fungalITSReference = fungalITSReference,
-    outputLog = outputLog,
-    outputLogStatus = outputLogStatus
-  ))
+  valid = validMarker && validITSRegion && validMemAllocation &&
+    validClassifierSource && validExternalPath &&
+    validFungalITSReference,
+
+  genMarker = list(value = genMarker, valid = validMarker),
+  itsRegion = list(value = itsRegion, valid = validITSRegion),
+  memAllocation = list(value = memAllocation, valid = validMemAllocation),
+  classifierSource = list(value = classifierSource, valid = validClassifierSource),
+  externalPath = list(value = externalPath, valid = validExternalPath),
+  fungalITSReference = list(
+    value = fungalITSReference,
+    valid = validFungalITSReference
+  ),
+  outputLog = outputLog,
+  outputLogStatus = outputLogStatus
+))
 }

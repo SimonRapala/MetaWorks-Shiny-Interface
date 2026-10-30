@@ -114,10 +114,10 @@ seqprepValidation <- function(
   }
 
   return(list(
-    phredScore = phredScore,
-    minReadOverlap = minReadOverlap,
-    maxMismatchFraction = maxMismatchFraction,
-    minMatchingOverlapFraction = minMatchingOverlapFraction,
+    phredScore = list(value  = phredScore, valid = validPhred),
+    minReadOverlap = list(value = minReadOverlap, valid = validMinOverlap),
+    maxMismatchFraction = list(value = maxMismatchFraction, valid = validMaxMismatch),
+    minMatchingOverlapFraction = list(value = minMatchingOverlapFraction, valid = validMatchingOverlap),
     outputLog = outputLog,
     outputLogStatus = outputLogStatus,
     valid = (

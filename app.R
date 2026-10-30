@@ -1150,8 +1150,77 @@ ui <- page_navbar(
         ),
         nav_panel_hidden(
           value = "review",
-          h2("Review"),
-          p("Review your job before running it.")
+          layout_columns(
+            col_widths = breakpoints(
+              md = c(6, 6, 6, 6, 6, 6)
+            ),
+            card(
+              card_header(
+                class = "reviewSEQPREPHeader",
+                h4("SEQPREP Review"),
+              ),
+              card_body(
+                uiOutput(
+                  outputId = "reviewSEQPREPLog"
+                )
+              )
+            ),
+            card(
+              card_header(
+                class = "reviewCUTADAPTHeader",
+                h4("CUTADAPT Review"),
+              ),
+              card_body(
+                uiOutput(
+                  outputId = "reviewCUTADAPTLog"
+                )
+              )
+            ),
+            card(
+              card_header(
+                class = "reviewVSEARCHHeader",
+                h4("VSEARCH Review"),
+              ),
+              card_body(
+                uiOutput(
+                  outputId = "reviewVSEARCHLog"
+                )
+              )
+            ),
+            card(
+              card_header(
+                class = "reviewClassificationHeader",
+                h4("Classification Review"),
+              ),
+              card_body(
+                uiOutput(
+                  outputId = "reviewClassificationLog"
+                )
+              )
+            ),
+            card(
+              card_header(
+                class = "reviewPseudogeneHeader",
+                h4("Pseudogene Filtering Review"),
+              ),
+              card_body(
+                uiOutput(
+                  outputId = "reviewPseudogeneLog"
+                )
+              )
+            ),
+            card(
+              card_header(
+                class = "reviewOutputHeader",
+                h4("Output Review"),
+              ),
+              card_body(
+                uiOutput(
+                  outputId = "reviewOutputLog"
+                )
+              )
+            ),
+          )
         )
       )
     )
